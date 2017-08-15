@@ -1,0 +1,36 @@
+# Archivo de configuraciones estáticas
+
+Aplicacion=SACVeFor - Registro único de entidades (RUE)
+
+RutaAplicacion=/rue
+
+TimeZone=America/Buenos_Aires
+
+# Claves para encriptar y desencriptar las contraseñas de los usurios a validar para el acceso de la API REST
+ClaveEncriptar=ministeriodeambiente
+ClaveDesencriptar=zorbazorbas
+
+################ Racices Paramétricas ################
+MenuPerametricas=Parámetros
+RaizTipoEntidad=faces/param/tipoEnt
+RaizTipoSociedad=faces/param/tipoSoc
+
+################ Racices Seguridad ################
+MenuSeguridad=Seguridad
+RaizRol=faces/seg/rol
+RaizUsuario=faces/seg/usuario
+
+################ Racices principal ################
+MenuPrincipal=Principal
+RaizPerFisica=faces/princ/perFisica
+RaizPerJuridica=faces/princ/perJuridica
+RaizVehiculo=faces/princ/vehiculo
+RaizModelo=faces/princ/modelo
+RaizMarca=faces/princ/marca
+
+################ Racices Auditorías ################
+MenuAuditoria=Auditorias
+RaizDomicilioAud=faces/audit/domicilio_aud
+RaizPersonaAud=faces/audit/persona_aud
+RaizUsuarioAud=faces/audit/usuario_aud
+RaizVehiculoAud=faces/audit/vehiculo_aud

@@ -1,0 +1,85 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="title">
+            <h:outputText value="Prueba Envers EclipseLynk" />
+        </ui:define>
+        <ui:define name="content">
+            <h:outputText value="Modelos de Vehículos de transporte" />
+            <h:form prependId="false" id="frModelos">
+                <p:panel id="pnFrm" header="Crear/Editar" style="margin-bottom:10px;">
+                    <p:growl id="messages" showDetail="false" />
+                    <p:inputText type="hidden" id="id" value="#{mbModelo.modelo.id}" />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="Nombre" for="nombre"/>
+                        <p:inputText id="nombre" value="#{mbModelo.modelo.nombre}" style="text-transform: uppercase"
+                                 requiredMessage="Debe ingresar el Nombre" required="true"/>
+                        
+                        <p:outputLabel value="Marca" for="cmbModelo"/>   
+                        <p:selectOneMenu id="cmbModelo" value="#{mbModelo.modelo.marca}" required="true" 
+                                         requiredMessage="Debe seleccionar una Marca, si no existe deberá registrarlo." >
+                            <f:selectItem itemLabel="Seleccione la Marca" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{mbModelo.lstMarcas}" 
+                                           var="marca" itemLabel="#{marca.nombre}" itemValue="#{marca}"/>
+                        </p:selectOneMenu>  
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2">
+                        <p:commandButton icon="ui-icon-check" value="Guardar" action="#{mbModelo.saveModelo()}" update="frModelos"/>
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" action="#{mbModelo.limpiarForm()}" update="pnFrm"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;">
+                    <p:dataTable value="#{mbModelo.lstModelos}"
+                                 filteredValue="#{mbModelo.lstFilters}"
+                         var="modelo"
+                         id="dtModelo" 
+                         rows="5"
+                         paginator="true"      
+                         widgetVar="mdlTable"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <p:commandButton icon="ui-icon-refresh" value="Limpiar filtros" 
+                                     onclick="PF('mdlTable').clearFilters()" update="dtModelo"/>
+                        </f:facet>
+                        <p:column headerText="id" style="width:50px">
+                            <p:outputLabel value="#{modelo.id}"/>
+                        </p:column>
+                        <p:column headerText="Nombre" 
+                            filterMatchMode="contains"
+                            sortBy="#{modelo.nombre}" 
+                            filterBy="#{modelo.nombre}">
+                            <p:outputLabel value="#{modelo.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Marca" 
+                            filterMatchMode="contains"
+                            sortBy="#{modelo.marca.nombre}" 
+                            filterBy="#{modelo.marca.nombre}">
+                            <p:outputLabel value="#{modelo.marca.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Acciones" style="width:75px">
+                            <p:commandButton icon="ui-icon-pencil" title="Editar" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{modelo}" target="#{mbModelo.modelo}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon=" ui-icon-trash" title="Eliminar" action="#{mbModelo.deleteModelo()}" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{modelo}" target="#{mbModelo.modelo}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea eliminar el Modelo seleccionado: #{modelo.nombre}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog> 
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

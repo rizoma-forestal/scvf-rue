@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="content">
+            <h1>Auditoría de Vehículos</h1>
+            <h:form prependId="false" id="frVehiculosAud">
+                <p:panel id="pnFrmRev" header="Ver modificaciones por Vehículo" style="margin-bottom:10px;" >
+                    <p:growl id="messages" showDetail="false" />
+                    <h:panelGrid columns="3">
+                        <p:outputLabel value="Matrícula" for="id"/>
+                        <p:inputText id="id" value="#{mbVehiculo.matVehAud}" required="true" requiredMessage="Debe ingresar una matrícula para la búsqueda" />
+                        <p:commandButton icon="ui-icon-check" value="Ver revisiones" action="#{mbVehiculo.listarRevisones()}" update="frVehiculosAud"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnFrmView" header="Detalle" style="margin-bottom:10px;" rendered="#{mbVehiculo.view}" toggleable="true">
+                    <h:panelGrid id="pgDatosGrales" columns="2" >
+                        <p:outputLabel value="Id: " for="v_id"/>
+                        <p:outputLabel id="v_id" value="#{mbVehiculo.vehiculo.id}"/>
+                        <p:outputLabel value="Matrícula: " for="v_matricula" />
+                        <p:outputLabel id="v_matricula" value="#{mbVehiculo.vehiculo.matricula}" />
+                        <p:outputLabel value="Marca: " for="v_marca" />
+                        <p:outputLabel id="v_marca" value="#{mbVehiculo.vehiculo.modelo.marca.nombre}" />
+                        <p:outputLabel value="Modelo: " for="v_modelo" />
+                        <p:outputLabel id="v_modelo" value="#{mbVehiculo.vehiculo.modelo.nombre}" />
+                        <p:outputLabel value="Anio: " for="v_anio" />
+                        <p:outputLabel id="v_anio" value="#{mbVehiculo.vehiculo.anio}" />
+                        <p:outputLabel value="Empresa/Titular: " for="v_empresa"/>
+                        <p:outputLabel id="v_empresa" value="#{mbVehiculo.vehiculo.empresa.cuit} - #{mbVehiculo.vehiculo.empresa.nombreCompleto}#{mbVehiculo.vehiculo.empresa.razonSocial} - #{mbVehiculo.vehiculo.empresa.tipo.nombre}"/>
+                        <p:outputLabel value="Usuario: " for="v_us"/>
+                        <p:outputLabel id="v_us" value="#{mbVehiculo.vehiculo.strUsuario}"/>
+                        <p:outputLabel value="Fecha de revisión: " for="v_fechaRev"/>
+                        <p:outputLabel id="v_fechaRev" value="#{mbVehiculo.vehiculo.fechaRevision}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy 'a' HH:mm" timeZone="#{bundle.TimeZone}" />
+                        </p:outputLabel>
+                    </h:panelGrid>
+                </p:panel>
+                             
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;" toggleable="true">
+                    <p:dataTable value="#{mbVehiculo.lstRevisions}"
+                                 filteredValue="#{mbVehiculo.lstFilters}"
+                         var="vehiculo"
+                         id="dtVehiculoAud" 
+                         rows="5"
+                         paginator="true"      
+                         widgetVar="wgVehiculoAud"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <p:commandButton icon="ui-icon-refresh" value="Limpiar filtros" 
+                                     onclick="PF('wgVehiculoAud').clearFilters()" update="dtVehiculoAud"/>
+                            <p:commandButton id="toggler" type="button" value="Columnas" icon="ui-icon-calculator" style="margin-left: 10px" />
+                            <p:columnToggler datasource="dtVehiculoAud" trigger="toggler" />
+                        </f:facet>
+                        <p:column headerText="Matrícula" style="width:70px" >
+                            <p:outputLabel value="#{vehiculo.matricula}"/>
+                        </p:column>
+                        <p:column headerText="Marca" >
+                            <p:outputLabel value="#{vehiculo.modelo.marca.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Modelo" >
+                            <p:outputLabel value="#{vehiculo.modelo.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Año" style="width:35px" >
+                            <p:outputLabel value="#{vehiculo.anio}"/>
+                        </p:column>
+                        <p:column headerText="Empresa" >
+                            <p:outputLabel value="#{vehiculo.empresa.nombreCompleto}#{vehiculo.empresa.razonSocial}"/>
+                        </p:column>
+                        <p:column headerText="Usuario" >
+                            <p:outputLabel value="#{vehiculo.strUsuario}"/>
+                        </p:column>
+                        <p:column headerText="Fecha revisión" 
+                            filterMatchMode="contains"
+                            sortBy="#{vehiculo.fechaRevision}" 
+                            filterBy="#{vehiculo.fechaRevision}">
+                            <p:outputLabel value="#{vehiculo.fechaRevision}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy 'a' HH:mm" timeZone="#{bundle.TimeZone}" />
+                            </p:outputLabel>
+                        </p:column>
+
+                        <p:column filterBy="#{vehiculo.habilitado}" headerText="Estado" filterMatchMode="equals" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('wgVehiculoAud').filter()" style="font-size: 80%;">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="Todos" itemValue="" />
+                                    <f:selectItem itemLabel="Habilitados" itemValue="true" />
+                                    <f:selectItem itemLabel="Deshabilitados" itemValue="false" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{vehiculo.habilitado ? 'Habilitado': 'Deshabilitado'}" />
+                        </p:column>
+                        <p:column headerText="Acc." style="width:35px">
+                            <p:commandButton icon="ui-icon-zoomin" update="@form" process="@this" title="Ver detalle" action="#{mbVehiculo.prepareVIew()}" >
+                                <f:setPropertyActionListener value="#{vehiculo}" target="#{mbVehiculo.vehiculo}" /> 
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>  
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

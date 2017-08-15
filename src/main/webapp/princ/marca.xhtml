@@ -1,0 +1,70 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="title">
+            <h:outputText value="Prueba Envers EclipseLynk" />
+        </ui:define>
+        <ui:define name="content">
+            <h:outputText value="Marcas de Vehículos de transporte" />
+            <h:form prependId="false" id="frMarcas">
+                <p:panel id="pnFrm" header="Crear/Editar" style="margin-bottom:10px;">
+                    <p:growl id="messages" showDetail="false" />
+                    <h:panelGrid columns="3">
+                        <p:inputText type="hidden" id="id" value="#{mbMarca.marca.id}" />
+                        <p:outputLabel value="Nombre" for="nombre"/>
+                        <p:inputText id="nombre" value="#{mbMarca.marca.nombre}" style="text-transform: uppercase"
+                                 requiredMessage="Debe ingresar el Nombre" required="true"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:commandButton icon="ui-icon-check" value="Guardar" action="#{mbMarca.saveMarca()}" update="frMarcas"/>
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" action="#{mbMarca.limpiarForm()}" update="pnFrm"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;">
+                    <p:dataTable value="#{mbMarca.lstMarcas}"
+                                 filteredValue="#{mbMarca.lstFilters}"
+                         var="marca"
+                         id="dtMarcas" 
+                         rows="5"
+                         paginator="true"      
+                         widgetVar="mrcTable"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <p:commandButton icon="ui-icon-refresh" value="Limpiar filtros" 
+                                     onclick="PF('mrcTable').clearFilters()" update="dtMarcas"/>
+                        </f:facet>
+                        <p:column headerText="id" style="width:50px">
+                            <p:outputLabel value="#{marca.id}"/>
+                        </p:column>
+                        <p:column headerText="Nombre" 
+                            filterMatchMode="contains"
+                            sortBy="#{marca.nombre}" 
+                            filterBy="#{marca.nombre}">
+                            <p:outputLabel value="#{marca.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Acciones" style="width:75px">
+                            <p:commandButton icon="ui-icon-pencil" title="Editar" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{marca}" target="#{mbMarca.marca}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon=" ui-icon-trash" title="Eliminar" action="#{mbMarca.deleteMarca()}" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{marca}" target="#{mbMarca.marca}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea eliminar la Marca seleccionada: #{marca.nombre}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog> 
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

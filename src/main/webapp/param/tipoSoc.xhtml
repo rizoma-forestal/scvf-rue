@@ -1,0 +1,65 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="content">
+            <h1>Tipos de Sociedad</h1>
+            <h:form prependId="false" id="frTipoSoc">
+                <p:panel id="pnFrm" header="Crear/Editar/Ver detalle" style="margin-bottom:10px;">
+                    <p:growl id="messages" showDetail="false" />
+                    <p:inputText type="hidden" id="id" value="#{mbTipoSociedad.tipoSociedad.id}" />
+                    <h:panelGrid columns="2">
+                        <p:outputLabel value="Nombre" for="nombre"/>
+                        <p:inputText id="nombre" value="#{mbTipoSociedad.tipoSociedad.nombre}" style="text-transform: uppercase; width: 250px"
+                                 requiredMessage="Debe ingresar el Nombre" required="true"/>
+                        <p:outputLabel value="Sigla" for="sigla"/>
+                        <p:inputText id="sigla" value="#{mbTipoSociedad.tipoSociedad.sigla}" style="text-transform: uppercase ; width: 50px"
+                                 requiredMessage="Debe ingresar la Sigla" required="true"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:commandButton icon="ui-icon-check" value="Guardar" action="#{mbTipoSociedad.saveTipoSociedad()}" update="frTipoSoc"/>
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" action="#{mbTipoSociedad.limpiarForm()}" update="pnFrm"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;">
+                    <p:dataTable value="#{mbTipoSociedad.lstTipoSociedades}"
+                         var="tipoSociedad"
+                         id="dtTipoSociedad" 
+                         rows="5"
+                         paginator="true"      
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+
+                        <p:column headerText="id" style="width:50px">
+                            <p:outputLabel value="#{tipoSociedad.id}"/>
+                        </p:column>
+                        <p:column headerText="Nombre" >
+                            <p:outputLabel value="#{tipoSociedad.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Sigla" >
+                            <p:outputLabel value="#{tipoSociedad.sigla}"/>
+                        </p:column>
+                        <p:column headerText="Acciones" style="width:75px">
+                            <p:commandButton icon="ui-icon-pencil" title="Editar" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{tipoSociedad}" target="#{mbTipoSociedad.tipoSociedad}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon=" ui-icon-trash" title="Eliminar" action="#{mbTipoSociedad.deleteTipoSociedad()}" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{tipoSociedad}" target="#{mbTipoSociedad.tipoSociedad}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea eliminar el Tipo de Sociedad seleccionado: #{tipoSociedad.nombre}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog> 
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

@@ -1,0 +1,180 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="content">
+            <h1>Usuarios</h1>
+            <h:form prependId="false" id="frUsuarios">
+                <p:panel id="pnFrm" header="Crear/Editar/Ver detalle" style="margin-bottom:10px;"  toggleable="true">
+                    <p:growl id="messages" showDetail="false" />
+                    
+                    <!-- Campos ocultos -->
+                    <p:inputText type="hidden" id="id" value="#{mbUsuario.usuario.id}" />
+                    <p:inputText type="hidden" id="fechaAlta" value="#{mbUsuario.usuario.fechaAlta}" >
+                        <f:convertDateTime pattern="dd-MM-yyyy"/>  
+                    </p:inputText>
+                    <p:inputText type="hidden" id="view" value="#{mbUsuario.view}" />
+                    <p:inputText type="hidden" id="habilitado" value="#{mbUsuario.usuario.habilitado}" />
+                    <p:inputText type="hidden" id="pass" value="#{mbUsuario.usuario.pass}" />
+                    <p:inputText type="hidden" id="token" value="#{mbUsuario.usuario.token}" />
+                    
+                    <!-- Formulario new y edit -->
+                    <h:panelGrid columns="4" rendered="#{not mbUsuario.view}">
+                        <p:outputLabel value="Nombre" for="nombre"/>
+                        <p:inputText id="nombre" value="#{mbUsuario.usuario.nombre}"
+                                 requiredMessage="Debe ingresar el Nombre" required="true"/>
+                        
+                        <p:outputLabel value="Nombre completo" for="nombreCompleto"/>
+                        <p:inputText id="nombreCompleto" value="#{mbUsuario.usuario.nombreCompleto}" style="text-transform: uppercase" size="50"
+                                 requiredMessage="Debe ingresar el Nombre completo" required="true"/>
+                        
+                        <p:outputLabel value="Correo electrónico" for="email"/>
+                        <p:inputText id="email" value="#{mbUsuario.usuario.email}" size="50"
+                                     requiredMessage="Debe ingresar el Correo electrónico" required="true" 
+                                     validatorMessage="Formato de correo electrónico inválido" >
+                            <f:validateRegex pattern="^[_A-Za-z0-9-\+]+(\.[_A-Za-z0-9-]+)*@[A-Za-z0-9-]+(\.[A-Za-z0-9]+)*(\.[A-Za-z]{2,})$" />
+                        </p:inputText>
+
+                        <p:outputLabel value="Rol" for="cmbRoles"/>   
+                        <p:selectOneMenu id="cmbRoles" value="#{mbUsuario.usuario.rol}" required="true" 
+                                         requiredMessage="Debe seleccionar un Rol, si no existe deberá registrarlo." >
+                            <f:selectItem itemLabel="Seleccione el Rol" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{mbUsuario.lstRoles}" 
+                                           var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol}"/>
+                            <p:ajax update="cmbProvincias" />
+                        </p:selectOneMenu>  
+                        <p:outputLabel value="Provincia" for="cmbProvincias"/>   
+                        <p:selectOneMenu id="cmbProvincias" value="#{mbUsuario.provincia}" disabled="#{mbUsuario.usuario.rol.nombre eq 'ADMIN'}" >
+                            <f:selectItem itemLabel="Seleccione la Provincia" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{mbUsuario.lstProvincias}" 
+                                           var="rol" itemLabel="#{rol.nombre}" itemValue="#{rol}"/>
+                        </p:selectOneMenu>  
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2" rendered="#{not mbUsuario.view}">
+                        <p:commandButton icon="ui-icon-check" value="Guardar" action="#{mbUsuario.saveUsuario()}" update="frUsuarios"/>
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" action="#{mbUsuario.limpiarForm()}" update="pnFrm"/>
+                    </h:panelGrid>
+                    
+                    <!-- Formulario view -->
+                    <h:panelGrid columns="2" rendered="#{mbUsuario.view}">
+                        <p:outputLabel value="Id: " for="v_id"/>
+                        <p:outputLabel id="v_id" value="#{mbUsuario.usuario.id}"/>
+                        <p:outputLabel value="Nombre: " for="v_nombre"/>
+                        <p:outputLabel id="v_nombre" value="#{mbUsuario.usuario.nombre}"/>
+                        <p:outputLabel value="Nombre completo: " for="v_nombreComp"/>
+                        <p:outputLabel id="v_nombreComp" value="#{mbUsuario.usuario.nombreCompleto}"/>
+                        <p:outputLabel value="E-mail: " for="v_email"/>
+                        <p:outputLabel id="v_email" value="#{mbUsuario.usuario.email}"/>
+                        <p:outputLabel value="Rol: " for="v_rol"/>
+                        <p:outputLabel id="v_rol" value="#{mbUsuario.usuario.rol.nombre}"/>
+                        <p:outputLabel value="Provincia: " for="v_prov" rendered="#{mbUsuario.usuario.rol.nombre eq 'API'}"/>
+                        <p:outputLabel id="v_prov" value="#{mbUsuario.usuario.provincia}" rendered="#{mbUsuario.usuario.rol.nombre eq 'API'}"/>
+                        <p:outputLabel value="Habilitado: " for="v_habilitado"/>
+                        <p:outputLabel id="v_habilitado" value="#{mbUsuario.usuario.habilitado}" />
+                    </h:panelGrid> 
+                    <h:panelGrid columns="2" rendered="#{mbUsuario.view}">
+                        <p:commandButton icon="ui-icon-plus" value="Agregar" process="@this" update="@form" action="#{mbUsuario.prepareNew()}" />
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;" toggleable="true">
+                    <p:dataTable value="#{mbUsuario.lstUsuarios}"
+                                 filteredValue="#{mbUsuario.lstFilters}"
+                         var="usuario"
+                         id="dtUsuario" 
+                         rows="5"
+                         paginator="true"      
+                         widgetVar="usTable"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <p:commandButton icon="ui-icon-refresh" value="Limpiar filtros" 
+                                     onclick="PF('usTable').clearFilters()" update="dtUsuario"/>
+                            <p:commandButton id="toggler" type="button" value="Columnas" icon="ui-icon-calculator" style="margin-left: 10px" />
+                            <p:columnToggler datasource="dtUsuario" trigger="toggler" />
+                        </f:facet>
+                        <p:column headerText="id" style="width:25px">
+                            <p:outputLabel value="#{usuario.id}"/>
+                        </p:column>
+                        <p:column headerText="Nombre" 
+                            filterMatchMode="contains"
+                            sortBy="#{usuario.nombre}" 
+                            filterBy="#{usuario.nombre}">
+                            <p:outputLabel value="#{usuario.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Nombre completo" 
+                            filterMatchMode="contains"
+                            sortBy="#{usuario.nombreCompleto}" 
+                            filterBy="#{usuario.nombreCompleto}">
+                            <p:outputLabel value="#{usuario.nombreCompleto}"/>
+                        </p:column>
+                        <p:column headerText="E-mail" 
+                            filterMatchMode="contains"
+                            sortBy="#{usuario.email}" 
+                            filterBy="#{usuario.email}">
+                            <p:outputLabel value="#{usuario.email}"/>
+                        </p:column>
+                        <p:column headerText="Rol" style="width:110px" 
+                            filterMatchMode="contains"
+                            sortBy="#{usuario.rol.nombre}" 
+                            filterBy="#{usuario.rol.nombre}">
+                            <p:outputLabel value="#{usuario.rol.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Provincia" 
+                            filterMatchMode="contains"
+                            sortBy="#{usuario.provincia}" 
+                            filterBy="#{usuario.provincia}">
+                            <p:outputLabel value="#{usuario.provincia}"/>
+                        </p:column>
+                        <p:column filterBy="#{usuario.habilitado}" headerText="Estado" filterMatchMode="equals" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('usTable').filter()" style="font-size: 80%;">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="Todos" itemValue="" />
+                                    <f:selectItem itemLabel="Habilitados" itemValue="true" />
+                                    <f:selectItem itemLabel="Deshabilitados" itemValue="false" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{usuario.habilitado ? 'Habilitado': 'Deshabilitado'}" />
+                        </p:column>
+                        <p:column headerText="Acciones" style="width:180px">
+                            <p:commandButton icon="ui-icon-zoomin" title="Ver detalle" process="@this" update="@form" action="#{mbUsuario.prepareVIew()}" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{mbUsuario.usuario}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-pencil" title="Editar" process="@this" update="@form" action="#{mbUsuario.prepareEdit()}" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{mbUsuario.usuario}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-key" title="Cambiar Contraseña" process="@this" 
+                                             update="@form" action="#{mbUsuario.cambiarPass()}" rendered="#{usuario.rol.nombre eq 'API'}" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{mbUsuario.usuario}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-circle-close" title="Deshabilitar" action="#{mbUsuario.deshabilitarUsuario()}" 
+                                             process="@this" update="@form" rendered="#{usuario.habilitado}" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{mbUsuario.usuario}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea deshabilitar el Usuario seleccionado: #{usuario.nombre}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-circle-check" title="Habilitar" action="#{mbUsuario.habilitarUsuario()}" 
+                                             process="@this" update="@form" rendered="#{not usuario.habilitado}" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{mbUsuario.usuario}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea habilitar el Usuario seleccionado: #{usuario.nombre}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-trash" title="Eliminar" action="#{mbUsuario.deleteUsuario()}" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{mbUsuario.usuario}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea eliminar el Usuario seleccionado: #{usuario.nombre}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog> 
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

@@ -1,0 +1,105 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="content">
+            <h1>Auditoría de Usuarios</h1>
+            <h:form prependId="false" id="frUsuariosAud">
+                <p:panel id="pnFrmRev" header="Ver modificaciones por Usuario" style="margin-bottom:10px;" >
+                    <p:growl id="messages" showDetail="false" />
+                    <h:panelGrid columns="3">
+                        <p:outputLabel value="Nombre" for="id"/>
+                        <p:inputText id="id" value="#{mbUsuario.nombreAud}" required="true" requiredMessage="Debe ingresar un nombre de Usuario para la búsqueda" />
+                        <p:commandButton icon="ui-icon-check" value="Ver revisiones" action="#{mbUsuario.listarRevisones()}" update="frUsuariosAud"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnFrmView" header="Detalle" style="margin-bottom:10px;" rendered="#{mbUsuario.view}" toggleable="true">
+                    <h:panelGrid id="pgDatosGrales" columns="2" >
+                        <p:outputLabel value="Id: " for="v_id"/>
+                        <p:outputLabel id="v_id" value="#{mbUsuario.usuario.id}"/>
+                        <p:outputLabel value="Nombre: " for="v_nombre"/>
+                        <p:outputLabel id="v_nombre" value="#{mbUsuario.usuario.nombre}"/>
+                        <p:outputLabel value="Nombre completo: " for="v_nombreComp"/>
+                        <p:outputLabel id="v_nombreComp" value="#{mbUsuario.usuario.nombreCompleto}"/>
+                        <p:outputLabel value="E-mail: " for="v_email"/>
+                        <p:outputLabel id="v_email" value="#{mbUsuario.usuario.email}"/>
+                        <p:outputLabel value="Rol: " for="v_rol"/>
+                        <p:outputLabel id="v_rol" value="#{mbUsuario.usuario.rol.nombre}"/>
+                        <p:outputLabel value="Provincia: " for="v_prov" rendered="#{mbUsuario.usuario.rol.nombre eq 'API'}"/>
+                        <p:outputLabel id="v_prov" value="#{mbUsuario.usuario.provincia}" rendered="#{mbUsuario.usuario.rol.nombre eq 'API'}"/>
+                        <p:outputLabel value="Habilitado: " for="v_habilitado"/>
+                        <p:outputLabel id="v_habilitado" value="#{mbUsuario.usuario.habilitado}" />
+                        <p:outputLabel value="Fecha de revisión: " for="v_fechaRev"/>
+                        <p:outputLabel id="v_fechaRev" value="#{mbUsuario.usuario.fechaRevision}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy 'a' HH:mm" timeZone="#{bundle.TimeZone}" />
+                        </p:outputLabel>
+                    </h:panelGrid>
+                </p:panel>
+                             
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;" toggleable="true">
+                    <p:dataTable value="#{mbUsuario.lstRevisions}"
+                                 filteredValue="#{mbUsuario.lstFilters}"
+                         var="usuario"
+                         id="dtUsuarioAud" 
+                         rows="5"
+                         paginator="true"      
+                         widgetVar="wgUsuarioAud"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <p:commandButton icon="ui-icon-refresh" value="Limpiar filtros" 
+                                     onclick="PF('wgUsuarioAud').clearFilters()" update="dtUsuarioAud"/>
+                            <p:commandButton id="toggler" type="button" value="Columnas" icon="ui-icon-calculator" style="margin-left: 10px" />
+                            <p:columnToggler datasource="dtUsuarioAud" trigger="toggler" />
+                        </f:facet>
+                        <p:column headerText="Nombre" >
+                            <p:outputLabel value="#{usuario.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Nombre completo" >
+                            <p:outputLabel value="#{usuario.nombreCompleto}"/>
+                        </p:column>
+                        <p:column headerText="E-mail" >
+                            <p:outputLabel value="#{usuario.email}"/>
+                        </p:column>
+                        <p:column headerText="Rol" style="width:110px" >
+                            <p:outputLabel value="#{usuario.rol.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Provincia" >
+                            <p:outputLabel value="#{usuario.provincia}"/>
+                        </p:column>
+                        <p:column headerText="Fecha revisión" 
+                            filterMatchMode="contains"
+                            sortBy="#{usuario.fechaRevision}" 
+                            filterBy="#{usuario.fechaRevision}">
+                            <p:outputLabel value="#{usuario.fechaRevision}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy 'a' HH:mm" timeZone="#{bundle.TimeZone}" />
+                            </p:outputLabel>
+                        </p:column>
+
+                        <p:column filterBy="#{usuario.habilitado}" headerText="Estado" filterMatchMode="equals" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('wgUsuarioAud').filter()" style="font-size: 80%;">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="Todos" itemValue="" />
+                                    <f:selectItem itemLabel="Habilitados" itemValue="true" />
+                                    <f:selectItem itemLabel="Deshabilitados" itemValue="false" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{usuario.habilitado ? 'Habilitado': 'Deshabilitado'}" />
+                        </p:column>
+                        <p:column headerText="Acc." style="width:35px">
+                            <p:commandButton icon="ui-icon-zoomin" update="@form" process="@this" title="Ver detalle" action="#{mbUsuario.prepareVIew()}" >
+                                <f:setPropertyActionListener value="#{usuario}" target="#{mbUsuario.usuario}" /> 
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>  
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

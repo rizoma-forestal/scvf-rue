@@ -1,0 +1,128 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="content">
+            <h1>Auditoría de Personas</h1>
+            <h:form prependId="false" id="frPersonasAud">
+                <p:panel id="pnFrmRev" header="Ver modificaciones por Persona" style="margin-bottom:10px;" >
+                    <p:growl id="messages" showDetail="false" />
+                    <h:panelGrid columns="3">
+                        <p:outputLabel value="CUIT" for="id"/>
+                        <p:inputText id="id" value="#{mbPersona.cuitAud}" required="true" requiredMessage="Debe ingresar un CUIT para la búsqueda" />
+                        <p:commandButton icon="ui-icon-check" value="Ver revisiones" action="#{mbPersona.listarRevisones()}" update="frPersonasAud"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnFrmView" header="Detalle" style="margin-bottom:10px;" rendered="#{mbPersona.view}" toggleable="true">
+                    <h:panelGrid id="pgDatosGrales" columns="2" >
+                        <p:outputLabel value="Id: " for="v_id"/>
+                        <p:outputLabel id="v_id" value="#{mbPersona.persona.id}"/>
+                        <p:outputLabel value="Cuit: " for="v_cuit"/>
+                        <p:outputLabel id="v_cuit" value="#{mbPersona.persona.cuit}"/>
+                        <p:outputLabel value="Tipo: " for="v_tipo"/>
+                        <p:outputLabel id="v_tipo" value="#{mbPersona.persona.tipo.nombre}"/>
+                        <p:outputLabel value="Nombre/Raz. soc.: " for="v_nomRazSoc"/>
+                        <p:outputLabel id="v_nomRazSoc" value="#{mbPersona.persona.nombreCompleto}#{mbPersona.persona.razonSocial}"/>
+                        <p:outputLabel value="Entidad: " for="v_entidad"/>
+                        <p:outputLabel id="v_entidad" value="#{mbPersona.persona.entidad.nombre}"/>
+                        <p:outputLabel value="Tipo soc.: " for="v_tipoSoc" rendered="#{mbPersona.persona.tipoSociedad ne null}"/>
+                        <p:outputLabel id="v_tipoSoc" value="#{mbPersona.persona.tipoSociedad.nombre}" rendered="#{mbPersona.persona.tipoSociedad ne null}"/>
+                        <p:outputLabel value="Domicilio/Calle: " for="v_domCalle"/>
+                        <p:outputLabel id="v_domCalle" value="#{mbPersona.persona.domicilio.calle}"/>
+                        <p:outputLabel value="Domicilio/N°: " for="v_domNum"/>
+                        <p:outputLabel id="v_domNum" value="#{mbPersona.persona.domicilio.numero}"/>
+                        <p:outputLabel value="Domicilio/Piso: " for="v_domPiso"/>
+                        <p:outputLabel id="v_domPiso" value="#{mbPersona.persona.domicilio.piso}"/>
+                        <p:outputLabel value="Domicilio/Depto: " for="v_domDepto"/>
+                        <p:outputLabel id="v_domDepto" value="#{mbPersona.persona.domicilio.depto}"/>
+                        <p:outputLabel value="Domicilio/Localidad: " for="v_domLoc"/>
+                        <p:outputLabel id="v_domLoc" value="#{mbPersona.persona.domicilio.localidad}"/>
+                        <p:outputLabel value="Domicilio/Departamento: " for="v_domDepart"/>
+                        <p:outputLabel id="v_domDepart" value="#{mbPersona.persona.domicilio.departamento}"/>
+                        <p:outputLabel value="Domicilio/Provincia: " for="v_domProv"/>
+                        <p:outputLabel id="v_domProv" value="#{mbPersona.persona.domicilio.provincia}"/>
+                        <p:outputLabel value="Usuario: " for="v_us"/>
+                        <p:outputLabel id="v_us" value="#{mbPersona.persona.strUsuario}"/>
+                        <p:outputLabel value="Fecha de revisión: " for="v_fechaRev"/>
+                        <p:outputLabel id="v_fechaRev" value="#{mbPersona.persona.fechaRevision}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy 'a' HH:mm" timeZone="#{bundle.TimeZone}" />
+                        </p:outputLabel>
+                    </h:panelGrid>
+                </p:panel>
+                             
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;" toggleable="true">
+                    <p:dataTable value="#{mbPersona.lstRevisions}"
+                                 filteredValue="#{mbPersona.lstFilters}"
+                         var="persona"
+                         id="dtPersonaAud" 
+                         rows="5"
+                         paginator="true"      
+                         widgetVar="wgPersonaAud"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <p:commandButton icon="ui-icon-refresh" value="Limpiar filtros" 
+                                     onclick="PF('wgPersonaAud').clearFilters()" update="dtPersonaAud"/>
+                            <p:commandButton id="toggler" type="button" value="Columnas" icon="ui-icon-calculator" style="margin-left: 10px" />
+                            <p:columnToggler datasource="dtPersonaAud" trigger="toggler" />
+                        </f:facet>
+                        <p:column headerText="Cuit" >
+                            <p:outputLabel value="#{persona.cuit}"/>
+                        </p:column>
+                        <p:column headerText="Tipo" >
+                            <p:outputLabel value="#{persona.tipo.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Nombre/Raz. soc." >
+                            <p:outputLabel value="#{persona.nombreCompleto}#{persona.razonSocial}"/>
+                        </p:column>
+                        <p:column headerText="Entidad" style="width:130px" >
+                            <p:outputLabel value="#{persona.entidad.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Calle" >
+                            <p:outputLabel value="#{persona.domicilio.calle}"/>
+                        </p:column>
+                        <p:column headerText="N°" style="width:35px" >
+                            <p:outputLabel value="#{persona.domicilio.numero}"/>
+                        </p:column>
+                        <p:column headerText="Localidad" >
+                            <p:outputLabel value="#{persona.domicilio.localidad}"/>
+                        </p:column>
+                        <p:column headerText="Provincia" >
+                            <p:outputLabel value="#{persona.domicilio.provincia}"/>
+                        </p:column>
+                        <p:column headerText="Fecha revisión" 
+                            filterMatchMode="contains"
+                            sortBy="#{persona.fechaRevision}" 
+                            filterBy="#{persona.fechaRevision}">
+                            <p:outputLabel value="#{persona.fechaRevision}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy 'a' HH:mm" timeZone="#{bundle.TimeZone}" />
+                            </p:outputLabel>
+                        </p:column>
+
+                        <p:column filterBy="#{persona.habilitado}" headerText="Estado" filterMatchMode="equals" style="width:130px" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('wgPersonaAud').filter()" style="font-size: 80%;">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="Todos" itemValue="" />
+                                    <f:selectItem itemLabel="Habilitados" itemValue="true" />
+                                    <f:selectItem itemLabel="Deshabilitados" itemValue="false" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{persona.habilitado ? 'Habilitado': 'Deshabilitado'}" />
+                        </p:column>
+                        <p:column headerText="Acc." style="width:35px">
+                            <p:commandButton icon="ui-icon-zoomin" update="@form" process="@this" title="Ver detalle" action="#{mbPersona.prepareVIew()}" >
+                                <f:setPropertyActionListener value="#{persona}" target="#{mbPersona.persona}" /> 
+                            </p:commandButton>
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>  
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

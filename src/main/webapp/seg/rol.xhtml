@@ -1,0 +1,59 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="content">
+            <h1>Roles de Usuarios</h1>
+            <h:form prependId="false" id="frRoles">
+                <p:panel id="pnFrm" header="Crear/Editar" style="margin-bottom:10px;">
+                    <p:growl id="messages" showDetail="false" />
+                    <h:panelGrid columns="3">
+                        <p:inputText type="hidden" id="id" value="#{mbRol.rol.id}" />
+                        <p:outputLabel value="Nombre" for="nombre"/>
+                        <p:inputText id="nombre" value="#{mbRol.rol.nombre}" style="text-transform: uppercase"
+                                 requiredMessage="Debe ingresar el Nombre" required="true"/>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2">
+                        <p:commandButton icon="ui-icon-check" value="Guardar" action="#{mbRol.saveRol()}" update="frRoles"/>
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" action="#{mbRol.limpiarForm()}" update="pnFrm"/>
+                    </h:panelGrid>
+                </p:panel>
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;">
+                    <p:dataTable value="#{mbRol.lstRoles}"
+                         var="rol"
+                         id="dtRoles" 
+                         rows="5"
+                         paginator="true"      
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+
+                        <p:column headerText="id" style="width:50px">
+                            <p:outputLabel value="#{rol.id}"/>
+                        </p:column>
+                        <p:column headerText="Nombre" >
+                            <p:outputLabel value="#{rol.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Acciones" style="width:75px">
+                            <p:commandButton icon="ui-icon-pencil" title="Editar" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{rol}" target="#{mbRol.rol}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon=" ui-icon-trash" title="Eliminar" action="#{mbRol.deleteRol()}" process="@this" update="@form" >
+                                <f:setPropertyActionListener value="#{rol}" target="#{mbRol.rol}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea eliminar el Rol seleccionado: #{rol.nombre}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog> 
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

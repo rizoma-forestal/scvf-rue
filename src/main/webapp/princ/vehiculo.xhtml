@@ -1,0 +1,177 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/WEB-INF/facelets/templates/indexTemplate.xhtml">
+        <ui:define name="content">
+            <h1>Vehículos</h1>
+            <h:form prependId="false" id="frVehiculos">
+                <p:panel id="pnFrm" header="Crear/Editar/Ver detalle" style="margin-bottom:10px;" collapsed="true" toggleable="true">
+                    <p:growl id="messages" showDetail="false" />
+                    
+                    <!-- Campos ocultos -->
+                    <p:inputText type="hidden" id="id" value="#{mbVehiculo.vehiculo.id}" />
+                    <p:inputText type="hidden" id="idProv" value="#{mbVehiculo.vehiculo.idProvinciaGt}" />
+                    <p:inputText type="hidden" id="provGest" value="#{mbVehiculo.vehiculo.provinciaGestion}" />
+                    <p:inputText type="hidden" id="fechaAlta" value="#{mbVehiculo.vehiculo.fechaAlta}" >
+                        <f:convertDateTime pattern="dd-MM-yyyy"/>  
+                    </p:inputText>
+                    <p:inputText type="hidden" id="view" value="#{mbVehiculo.view}" />
+                    <p:inputText type="hidden" id="habilitado" value="#{mbVehiculo.vehiculo.habilitado}" />
+                    
+                    <!-- Formulario new y edit -->
+                    <h:panelGrid id="pgVehGral" columns="4" rendered="#{not mbVehiculo.view}">
+                        <p:outputLabel value="Modelo" for="cmbModelos"/>   
+                        <p:selectOneMenu id="cmbModelos" value="#{mbVehiculo.vehiculo.modelo}" required="true" 
+                                         requiredMessage="Debe seleccionar un Modelo." >
+                            <f:selectItem itemLabel="Seleccione el Modelo" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{mbVehiculo.lstModelos}" 
+                                           var="modelo" itemLabel="#{modelo.marca.nombre} - #{modelo.nombre}" itemValue="#{modelo}"/>
+                        </p:selectOneMenu>  
+                        <p:outputLabel value="Matrícula" for="matricula" />
+                        <p:inputText id="matricula" value="#{mbVehiculo.vehiculo.matricula}" style="text-transform: uppercase" size="50" />
+                        <p:outputLabel value="Año" for="anio"/>
+                        <p:inputText id="anio" value="#{mbVehiculo.vehiculo.anio}" requiredMessage="Debe ingresar el Año" required="true" >
+                            <f:convertNumber integerOnly="true" type="number" />
+                        </p:inputText>
+                        <p:outputLabel value="Empresa" for="cmbEmpresas"/>   
+                        <p:selectOneMenu id="cmbEmpresas" value="#{mbVehiculo.vehiculo.empresa}" >
+                            <f:selectItem itemLabel="Seleccione la Empresa, si corresponde" itemValue="" noSelectionOption="true"/>
+                            <f:selectItems value="#{mbVehiculo.lstEmpresas}" 
+                                           var="empresa" itemLabel="#{empresa.nombreCompleto}#{empresa.razonSocial} - #{empresa.cuit} - #{empresa.tipo.nombre}" itemValue="#{empresa}"/>
+                        </p:selectOneMenu>  
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2" rendered="#{not mbVehiculo.view}">
+                        <p:commandButton icon="ui-icon-check" value="Guardar" actionListener="#{mbVehiculo.saveVehiculo()}" update="frVehiculos"/>
+                        <p:commandButton icon="ui-icon-refresh" value="Limpiar" action="#{mbVehiculo.limpiarForm()}" update="pgVehGral"/>
+                    </h:panelGrid>
+                    
+                    <!-- Formulario view -->
+                    <h:panelGrid id="pgDatosGrales" columns="2" rendered="#{mbVehiculo.view}" >
+                        <p:outputLabel value="Id: " for="v_id"/>
+                        <p:outputLabel id="v_id" value="#{mbVehiculo.vehiculo.id}"/>
+                        <p:outputLabel value="Provincia de gestión " for="v_provAlta"/>
+                        <p:outputLabel id="v_provAlta" value="#{mbVehiculo.vehiculo.provinciaGestion}"/>
+                        <p:outputLabel value="Modelo: " for="v_modelo"/>
+                        <p:outputLabel id="v_modelo" value="#{mbVehiculo.vehiculo.modelo.nombre}"/>
+                        <p:outputLabel value="Matrícula: " for="v_matricula" />
+                        <p:outputLabel id="v_matricula" value="#{mbVehiculo.vehiculo.matricula}" />
+                        <p:outputLabel value="Año: " for="v_anio"/>
+                        <p:outputLabel id="v_anio" value="#{mbVehiculo.vehiculo.anio}"/>
+                        <p:outputLabel value="Empresa/Titular: " for="v_empresa"/>
+                        <p:outputLabel id="v_empresa" value="#{mbVehiculo.vehiculo.empresa.cuit} - #{mbVehiculo.vehiculo.empresa.tipo.nombre}"/>
+                        <p:outputLabel value="Razón social/Nombre: " for="v_nombre"/>
+                        <p:outputLabel id="v_nombre" value="#{mbVehiculo.vehiculo.empresa.nombreCompleto}#{mbVehiculo.vehiculo.empresa.razonSocial}"/>
+                    </h:panelGrid>
+                    <p:separator rendered="#{mbVehiculo.view}" />
+                    <h:panelGrid id="pgDatosAdmin" columns="2" rendered="#{mbVehiculo.view}" >
+                        <p:outputLabel value="Ultimo usuario: " for="v_ultUs"/>
+                        <p:outputLabel id="v_ultUs" value="#{mbVehiculo.vehiculo.usuario.nombreCompleto}"/>
+                        <p:outputLabel value="Fecha de Alta: " for="v_fechaAlta"/>
+                        <p:outputLabel id="v_fechaAlta" value="#{mbVehiculo.vehiculo.fechaAlta}" >
+                            <f:convertDateTime pattern="dd/MM/yyyy" />
+                        </p:outputLabel>
+                        <p:outputLabel value="Habilitado: " for="v_habilitado"/>
+                        <p:outputLabel id="v_habilitado" value="#{mbVehiculo.vehiculo.habilitado}" />
+                    </h:panelGrid>
+
+                    <h:panelGrid columns="2" rendered="#{mbVehiculo.view}">
+                        <p:commandButton icon="ui-icon-plus" value="Agregar/Modificar" process="@this" update="@form" action="#{mbVehiculo.prepareNew()}" />
+                    </h:panelGrid>
+                </p:panel>
+                
+                <p:panel id="pnTabla" header="Listado" style="margin-bottom:10px;" toggleable="true">
+                    <p:dataTable value="#{mbVehiculo.lstVehiculos}"
+                                 filteredValue="#{mbVehiculo.lstFilters}"
+                         var="vehiculo"
+                         id="dtVehiculo" 
+                         rows="5"
+                         paginator="true"      
+                         widgetVar="wgVehiculo"
+                         paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                         rowsPerPageTemplate="5,10,15">
+                        <f:facet name="header">
+                            <p:commandButton icon="ui-icon-refresh" value="Limpiar filtros" 
+                                     onclick="PF('wgVehiculo').clearFilters()" update="dtVehiculo"/>
+                            <p:commandButton id="toggler" type="button" value="Columnas" icon="ui-icon-calculator" style="margin-left: 10px" />
+                            <p:columnToggler datasource="dtVehiculo" trigger="toggler" />
+                        </f:facet>
+                        <p:column headerText="id" style="width:25px">
+                            <p:outputLabel value="#{vehiculo.id}"/>
+                        </p:column>
+                        <p:column headerText="Marca" 
+                            filterMatchMode="contains"
+                            sortBy="#{vehiculo.modelo.marca.nombre}" 
+                            filterBy="#{vehiculo.modelo.marca.nombre}">
+                            <p:outputLabel value="#{vehiculo.modelo.marca.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Modelo" 
+                            filterMatchMode="contains"
+                            sortBy="#{vehiculo.modelo.nombre}" 
+                            filterBy="#{vehiculo.modelo.nombre}">
+                            <p:outputLabel value="#{vehiculo.modelo.nombre}"/>
+                        </p:column>
+                        <p:column headerText="Matrícula" 
+                            filterMatchMode="contains"
+                            sortBy="#{vehiculo.matricula}" 
+                            filterBy="#{vehiculo.matricula}">
+                            <p:outputLabel value="#{vehiculo.matricula}"/>
+                        </p:column>
+                        <p:column headerText="Año" 
+                            filterMatchMode="contains"
+                            sortBy="#{vehiculo.anio}" 
+                            filterBy="#{vehiculo.anio}">
+                            <p:outputLabel value="#{vehiculo.anio}"/>
+                        </p:column>
+                        <p:column headerText="Fecha de alta" 
+                            filterMatchMode="contains"
+                            sortBy="#{vehiculo.fechaAlta}" 
+                            filterBy="#{vehiculo.fechaAlta}">
+                            <p:outputLabel value="#{vehiculo.fechaAlta}" >
+                                <f:convertDateTime pattern="dd/MM/yyyy" />
+                            </p:outputLabel>
+                        </p:column>
+                        <p:column filterBy="#{vehiculo.habilitado}" headerText="Estado" filterMatchMode="equals" >
+                            <f:facet name="filter">
+                                <p:selectOneMenu onchange="PF('wgVehiculo').filter()" style="font-size: 80%;">
+                                    <f:converter converterId="javax.faces.Boolean" />
+                                    <f:selectItem itemLabel="Todos" itemValue="" />
+                                    <f:selectItem itemLabel="Habilitados" itemValue="true" />
+                                    <f:selectItem itemLabel="Deshabilitados" itemValue="false" />
+                                </p:selectOneMenu>
+                            </f:facet>
+                            <h:outputText value="#{vehiculo.habilitado ? 'Habilitado': 'Deshabilitado'}" />
+                        </p:column>
+                        <p:column headerText="Acciones" style="width:110px">
+                            <p:commandButton icon="ui-icon-zoomin" title="Ver detalle" process="@this" update="@form" action="#{mbVehiculo.prepareVIew()}" >
+                                <f:setPropertyActionListener value="#{vehiculo}" target="#{mbVehiculo.vehiculo}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-pencil" title="Editar" process="@this" update="@form" action="#{mbVehiculo.prepareEdit()}" >
+                                <f:setPropertyActionListener value="#{vehiculo}" target="#{mbVehiculo.vehiculo}" /> 
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-circle-close" title="Deshabilitar" action="#{mbVehiculo.deshabilitarVehiculo()}" 
+                                             process="@this" update="@form" rendered="#{vehiculo.habilitado}" >
+                                <f:setPropertyActionListener value="#{vehiculo}" target="#{mbVehiculo.vehiculo}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea deshabilitar a el Vehículo seleccionado: #{vehiculo.matricula}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:commandButton icon="ui-icon-circle-check" title="Habilitar" action="#{mbVehiculo.habilitarVehiculo()}" 
+                                             process="@this" update="@form" rendered="#{not vehiculo.habilitado}" >
+                                <f:setPropertyActionListener value="#{vehiculo}" target="#{mbVehiculo.vehiculo}" /> 
+                                <p:confirm header="Confirmar" message="¿Desea habilitar a el Vehículo seleccionado: #{vehiculo.matricula}?" icon="ui-icon-alert" />
+                            </p:commandButton>
+                            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade">
+                                <p:commandButton value="Si" type="button" styleClass="ui-confirmdialog-yes" icon="ui-icon-check" />
+                                <p:commandButton value="No" type="button" styleClass="ui-confirmdialog-no" icon="ui-icon-close" />
+                            </p:confirmDialog> 
+                        </p:column>
+                    </p:dataTable>
+                </p:panel>
+            </h:form>
+        </ui:define>
+    </ui:composition>
+</html>
+

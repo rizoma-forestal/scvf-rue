@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<faces-config version="2.2"
+              xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-facesconfig_2_2.xsd">
+    
+    <application>
+        <resource-bundle>
+            <base-name>/Bundle</base-name>
+            <var>bundle</var>
+        </resource-bundle>
+        <resource-bundle>
+            <base-name>/Config</base-name>
+            <var>config</var>
+        </resource-bundle>
+    </application>
+    
+    <managed-bean>
+        <managed-bean-name>mbMarca</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbMarca</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>mbModelo</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbModelo</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>mbVehiculo</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbVehiculo</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>mbRol</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbRol</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>mbUsuario</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbUsuario</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>mbPersona</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbPersona</managed-bean-class>
+        <managed-bean-scope>view</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>mbTipoEntidad</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbTipoEntidad</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+    <managed-bean>
+        <managed-bean-name>mbTipoSociedad</managed-bean-name>
+        <managed-bean-class>ar.gob.ambiente.sacvefor.rue.mb.MbTipoSociedad</managed-bean-class>
+        <managed-bean-scope>request</managed-bean-scope>
+    </managed-bean>
+</faces-config>
