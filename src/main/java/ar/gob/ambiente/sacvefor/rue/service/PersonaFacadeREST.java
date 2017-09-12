@@ -234,7 +234,7 @@ public class PersonaFacadeREST {
         // continúo con el seteo
         per.setCorreoElectronico(entity.getCorreoElectronico());
         per.setCuit(entity.getCuit());
-        if(entity.getDomicilio() != null){
+        if(entity.getDomicilio().getId() != 0){
             Domicilio dom = new Domicilio();
             dom.setCalle(entity.getDomicilio().getCalle());
             dom.setDepartamento(entity.getDomicilio().getDepartamento());
