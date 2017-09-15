@@ -216,7 +216,14 @@ public class PersonaFacadeREST {
                 per.setTipoSociedad(tipoSoc);
                 per.setRazonSocial(entity.getRazonSocial());
             }
+            
+            // si viene con un domicilio seteado, lo asigno a la Persona
+            if(entity.getDomicilio() != null){
+                per = setearDomicilio(entity, us, per);
+            }
+            
         }else{
+            // edito la persona existente
             per = personaFacade.find(id);
             // seteo nombre o razón social según corresponda
             if(per.getTipo().toString().equals("Persona Física")){
@@ -229,12 +236,54 @@ public class PersonaFacadeREST {
                 tipoSoc.setNombre(entity.getTipoSociedad().getNombre());
                 per.setTipoSociedad(tipoSoc);
             }
+            
+            // vrifico si tenía un domicilio previamente persistido
+            if(per.getDomicilio() != null){
+                // si tenía un Domicilio previamente
+                if(entity.getDomicilio() == null){
+                    // si viene vacío, seteo en null el persistido
+                    per.setDomicilio(null);
+                }else{
+                    // si viene completo lo seteo
+                    per = setearDomicilio(entity, us, per);
+                }
+            }else{
+                // si no tenía un Domicilio previamente
+                if(entity.getDomicilio() != null){
+                    // si viene completo lo seteo
+                    per = setearDomicilio(entity, us, per);
+                }
+            }
         }
         
         // continúo con el seteo
         per.setCorreoElectronico(entity.getCorreoElectronico());
         per.setCuit(entity.getCuit());
-        if(entity.getDomicilio().getId() != 0){
+
+        // instancio el Tipo de Entidad
+        TipoEntidad tipoEnt = new TipoEntidad();
+        tipoEnt.setId(entity.getEntidad().getId());
+        tipoEnt.setNombre(entity.getEntidad().getNombre());
+        per.setEntidad(tipoEnt);
+        
+        // completo
+        per.setUsuario(us);
+        per.setHabilitado(true);
+        per.setStrUsuario(us.getStrUsuario());        
+        return per;
+    }
+
+    /**
+     * Método para setear un Domicilio según la Persona tenga o no tenga Domicilio seteado.
+     * Si no tiene un Domicilio, lo setea y lo asigna a la Persona aue recibe como Parámetro.
+     * Si ya tiene, resetea el Domicilio existente con los datos recibidos en la entity.
+     * @param entity : entidad del paquete de la API-RUE Persona que recibión desde el CGL
+     * @param us : Usuario que registra la operación
+     * @param per : Persona que se insertará o editará, a la cual se le asigna el domicilio.
+     * @return : la Persona con el Domicilio asignado
+     */
+    private Persona setearDomicilio(ar.gob.ambiente.sacvefor.servicios.rue.Persona entity, Usuario us, Persona per) {
+        if(per.getDomicilio() == null){
             Domicilio dom = new Domicilio();
             dom.setCalle(entity.getDomicilio().getCalle());
             dom.setDepartamento(entity.getDomicilio().getDepartamento());
@@ -246,19 +295,20 @@ public class PersonaFacadeREST {
             dom.setProvincia(entity.getDomicilio().getProvincia());
             dom.setUsuario(us);
             dom.setStrUsuario(us.getStrUsuario());
-            // seteo el domicilio
+            // asigno el domicilio
             per.setDomicilio(dom);
+        }else{
+            per.getDomicilio().setCalle(entity.getDomicilio().getCalle());
+            per.getDomicilio().setDepartamento(entity.getDomicilio().getDepartamento());
+            per.getDomicilio().setDepto(entity.getDomicilio().getDepto());
+            per.getDomicilio().setIdLocalidadGt(entity.getDomicilio().getIdLocalidadGt());
+            per.getDomicilio().setLocalidad(entity.getDomicilio().getLocalidad());
+            per.getDomicilio().setNumero(entity.getDomicilio().getNumero());
+            per.getDomicilio().setPiso(entity.getDomicilio().getPiso());
+            per.getDomicilio().setProvincia(entity.getDomicilio().getProvincia());
+            per.getDomicilio().setUsuario(us);
+            per.getDomicilio().setStrUsuario(us.getStrUsuario());
         }
-        // instancio el Tipo de Entidad
-        TipoEntidad tipoEnt = new TipoEntidad();
-        tipoEnt.setId(entity.getEntidad().getId());
-        tipoEnt.setNombre(entity.getEntidad().getNombre());
-        per.setEntidad(tipoEnt);
-        
-        // completo
-        per.setUsuario(us);
-        per.setHabilitado(true);
-        per.setStrUsuario(us.getStrUsuario());        
         return per;
     }
 }

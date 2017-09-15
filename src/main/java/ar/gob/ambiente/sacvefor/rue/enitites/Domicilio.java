@@ -74,9 +74,9 @@ public class Domicilio implements Serializable {
     /**
      * Nombre de la provincia cacheado del servicio gestion territorial.
      */
-    @Column (nullable=false, length=30)
+    @Column (nullable=false, length=70)
     @NotNull(message = "El campo provincia no puede ser nulo")
-    @Size(message = "El campo provincia no puede tener más de 30 caracteres", min = 1, max = 30)
+    @Size(message = "El campo provincia no puede tener más de 70 caracteres", min = 1, max = 70)
     private String provincia;    
     
     /**
