@@ -23,7 +23,7 @@ public class DepartamentoClient {
 
     private WebTarget webTarget;
     private Client client;
-    private static final String BASE_URI = ResourceBundle.getBundle("/Config").getString("Server") + "/"
+    private static final String BASE_URI = ResourceBundle.getBundle("/Config").getString("ServerServicios") + "/"
             + "" + ResourceBundle.getBundle("/Config").getString("UrlTerritorial");
 
     public DepartamentoClient() {

@@ -1,4 +1,5 @@
 # Parámetros dinámicos
 Server=http://localhost:8080
+ServerServicios=http://localhost:8080
 UrlTerritorial=/gestionTerritorial/rest
 
