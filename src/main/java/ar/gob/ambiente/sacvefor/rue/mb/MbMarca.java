@@ -18,19 +18,36 @@ import javax.faces.convert.FacesConverter;
  */
 public class MbMarca {
     
+    /**
+     * Variable privada: Marca Entidad que se gestiona mediante el bean
+     */     
     private Marca marca;
+    
+    /**
+     * Variable privada: List<Marca> listado de las Marcas registradas que compone la tabla para su gestión
+     */
     private List<Marca> lstMarcas;
+    
+    /**
+     * Variable privada: listado para el filtrado de la tabla
+     */
     private List<Marca> lstFilters;
     
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Marca
+     */    
     @EJB
     private MarcaFacade marcaFacade;     
     
+    /**
+     * Cosntructor
+     */
     public MbMarca() {
     }
     
-    /**
-     * Métodos de acceso
-     */        
+    /**********************
+     * Métodos de acceso **
+     **********************/        
     public List<Marca> getLstFilters() {
         return lstFilters;
     }
@@ -47,6 +64,10 @@ public class MbMarca {
         this.marca = marca;
     }
 
+    /**
+     * Método que obtiene el conjunto de las entidades para gestionar
+     * @return List<Marca> listado de las entidades a gestionar
+     */
     public List<Marca> getLstMarcas() {
         lstMarcas = marcaFacade.findAll();
         return lstMarcas;
@@ -61,6 +82,9 @@ public class MbMarca {
      * Mátodos operativos **
      ***********************/
 
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa la entidad a gestionar
+     */    
     @PostConstruct
     public void init(){
         marca = new Marca();
@@ -132,6 +156,11 @@ public class MbMarca {
      * Métodos privados **
      *********************/
     
+    /**
+     * Método privado que recupera una Marca según su id
+     * @param key Long id de la entidad persistida
+     * @return Object la entidad correspondiente
+     */
     private Object getMarca(Long key) {
         return marcaFacade.find(key);
     }

@@ -18,12 +18,25 @@ import javax.faces.convert.FacesConverter;
  */
 public class MbTipoEntidad {
 
+    /**
+     * Variable privada: TipoEntidad Entidad que se gestiona mediante el bean
+     */
     private TipoEntidad tipoEntidad;
+    
+    /**
+     * Variable privada: List<TipoEntidad> listado de los tipos de entidades registrados que compone la tabla para su gestión
+     */
     private List<TipoEntidad> lstTipoEntidades;
     
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de TipoEntidad
+     */  
     @EJB
     private TipoEntidadFacade tipoEntidadFacade;
     
+    /**
+     * Constructor
+     */
     public MbTipoEntidad() {
     }
      
@@ -38,6 +51,10 @@ public class MbTipoEntidad {
         this.tipoEntidad = tipoEntidad;
     }
 
+    /**
+     * Método para obtener los Tipos de Entidades existentes y poblar el listado correspondiente
+     * @return List<TipoEntidad> listado con los Tipos de Entidades existentes
+     */
     public List<TipoEntidad> getLstTipoEntidades() {
         lstTipoEntidades = tipoEntidadFacade.findAll();
         return lstTipoEntidades;
@@ -50,6 +67,10 @@ public class MbTipoEntidad {
     /***********************
      * Mátodos operativos **
      ***********************/
+    
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa la entidad a gestionar
+     */    
     @PostConstruct
     public void init() {
         tipoEntidad = new TipoEntidad();
@@ -119,6 +140,12 @@ public class MbTipoEntidad {
     /*********************
      * Métodos privados **
      *********************/     
+    
+    /**
+     * Método privado que recupera un TipoEntidad según su id
+     * @param key Long id de la entidad persistida
+     * @return Object la entidad correspondiente
+     */    
     private Object getTipoEntidad(Long key) {
         return tipoEntidadFacade.find(key);
     }

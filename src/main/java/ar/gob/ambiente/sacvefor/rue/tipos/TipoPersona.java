@@ -1,5 +1,10 @@
 package ar.gob.ambiente.sacvefor.rue.tipos;
 
+/**
+ * Enum que guarda los tipos de personas:
+ * Física o Jurídica
+ * @author rincostante
+ */
 public enum TipoPersona {
     JURIDICA    ("Persona Jurídica"),
     FISICA      ("Persona Física");

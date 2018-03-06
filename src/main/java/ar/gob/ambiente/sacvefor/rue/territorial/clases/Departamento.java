@@ -12,17 +12,32 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 public class Departamento implements Serializable {
 
+    
     private Long id;
+    
+    
     private String nombre;
+    
+    
     private Provincia provincia;    
     
     /******************
      * Constructores **
      ******************/
+    
+    /**
+     * Constructor
+     */
     public Departamento(){
 
     }
     
+    /**
+     * Constructor que instancia la clase con parámetros
+     * @param id Long identificador del Departamento
+     * @param nombre String nombre del Departamento
+     * @param provincia Provincia provincia a la que pertenece el Departamento
+     */
     public Departamento(Long id, String nombre, Provincia provincia){
         this.id = id;
         this.nombre = "dafault";

@@ -13,28 +13,38 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 
 /**
- *
+ * Clase que implementa la abstracta para el acceso a datos de la entidad Vehículo.
  * @author rincostante
  */
 @Stateless
 public class VehiculoFacade extends AbstractFacade<Vehiculo> {
 
+    /**
+     * Variable privada: EntityManager al que se le indica la unidad de persistencia mediante la cual accederá a la base de datos
+     */          
     @PersistenceContext(unitName = "svf_ruePU")
     private EntityManager em;
 
+    /**
+     * Método que implementa el abstracto para la obtención del EntityManager
+     * @return EntityManager para acceder a datos
+     */       
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Constructor
+     */
     public VehiculoFacade() {
         super(Vehiculo.class);
     }
     
     /**
      * Método para obtener una Persona según su CUIT, si existe
-     * @param matricula
-     * @return 
+     * @param matricula String matrícula del vehículo a obtener
+     * @return Vehículo vehículo consultado
      */
     public Vehiculo getExistente(String matricula) {
         List<Vehiculo> lstVehiculos;
@@ -52,6 +62,11 @@ public class VehiculoFacade extends AbstractFacade<Vehiculo> {
         }
     }       
     
+    /**
+     * Método que obtiene uno o más vehículos según su titular
+     * @param cuit Long cuit del titular del vehículo
+     * @return List<Vehiculo> Vehículos vinculados al titular cuyo cuit se recibió
+     */
     public List<Vehiculo> getByTitular(Long cuit){
         List<Vehiculo> lstVehiculos;
         em = getEntityManager();
@@ -68,7 +83,7 @@ public class VehiculoFacade extends AbstractFacade<Vehiculo> {
     /**
      * Método que devuelve los Vehículos habilitados
      * Sin distinción del tipo.
-     * @return 
+     * @return List<Vehiculo> Listado de los vehículos habilitados
      */
     public List<Vehiculo> getHabilitadas(){
         List<Vehiculo> lstVehiculos;
@@ -82,6 +97,10 @@ public class VehiculoFacade extends AbstractFacade<Vehiculo> {
         return lstVehiculos;
     }   
     
+    /**
+     * Método sobreescrito de la AbstractFacade que obtiene todos los vehículos ordenados alfabéticamente por su Marca
+     * @return List<Vehiculo> Listado de los vehículos ordenados por su Marca
+     */
     @Override
     public List<Vehiculo> findAll(){
         em = getEntityManager();
@@ -93,8 +112,8 @@ public class VehiculoFacade extends AbstractFacade<Vehiculo> {
     
     /**
      * Método para obtener todas las revisiones de la entidad
-     * @param matricula
-     * @return 
+     * @param matricula String matrícula del vehículo a consultar sus revisiones
+     * @return List<Vehiculo> Listado de las revisiones del Vehículo cuya matrícula se recibió
      */
     public List<Vehiculo> findRevisions(String matricula){
         List<Vehiculo> lstClientes = new ArrayList<>();

@@ -22,29 +22,88 @@ import javax.ejb.EJB;
  */
 public class MbVehiculo {
 
-    // campos para gestionar
+    /**
+     * Variable privada: Vehiculo Entidad que se gestiona mediante el bean
+     */  
     private Vehiculo vehiculo;
+    
+    /**
+     * Variable privada: List<Vehiculo> listado de los Vehiculos registrados que compone la tabla para su gestión
+     */
     private List<Vehiculo> lstVehiculos;
+    
+    /**
+     * Variable privada: List<Vehiculo> listado para el filtrado de la tabla
+     */
     private List<Vehiculo> lstFilters;
+    
+    /**
+     * Variable privada: List<Vehiculo> listado de las revisiones de un vehículo, para su auditoría.
+     */
     private List<Vehiculo> lstRevisions;
+    
+    /**
+     * Variable privada: List<Modelo> listado de los Modelos disponibles para asignarlos a un vehículo al registrarlo o editar sus datos.
+     */
     private List<Modelo> lstModelos;   
+    
+    /**
+     * Variable privada: List<Persona> listado de las Perosnas disponibles para asignarlos a un vehículo como su titular 
+     * al registrarlo o editar sus datos, si corresponde.
+     */
     private List<Persona> lstEmpresas;
+    
+    /**
+     * Variable privada: boolean que indica que el formulario mostrado es de una vista detalle de la entidad
+     */
     private boolean view;   
+    
+    /**
+     * Variable privada: boolean que indica que el formulario mostrado es de una vista de edición de una entidad existente
+     */
     private boolean edit;
+    
+    /**
+     * Variable privada: Long id del Vehículo
+     */
     private Long idVehiculo;
+    
+    /**
+     * Variable privada: String matrícula del vehículo para su aditoría
+     */
     private String matVehAud;
+    
+    
     private List<Vehiculo> lstBorrados;
     
-    // inyección de recursos
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Vehiculo
+     */  
     @EJB
     private VehiculoFacade vehiculoFacade; 
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Modelo
+     */  
     @EJB
     private ModeloFacade modeloFacade;
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Persona
+     */ 
     @EJB
     private PersonaFacade personaFacade;
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Usuario
+     */ 
     @EJB
     private UsuarioFacade usuarioFacade;
     
+    /**
+     * Constructor
+     */
     public MbVehiculo() {
     }
      
@@ -115,6 +174,10 @@ public class MbVehiculo {
         this.vehiculo = vehiculo;
     }
 
+    /**
+     * Método para obtener el listado de los vehículos existentes
+     * @return List<Vehiculo> listado de vehículos existentes
+     */
     public List<Vehiculo> getLstVehiculos() {
         lstVehiculos = vehiculoFacade.findAll();
         return lstVehiculos;
@@ -144,6 +207,11 @@ public class MbVehiculo {
     /***********************
      * Mátodos operativos **
      ***********************/
+    
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa la entidad a gestionar, 
+     * el listado de Modelos disponibles, y el listado de las Empresas de transporte disponibles
+     */     
     @PostConstruct
     public void init(){
         vehiculo = new Vehiculo();

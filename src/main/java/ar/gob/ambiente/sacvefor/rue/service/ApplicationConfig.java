@@ -1,8 +1,4 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
+
 package ar.gob.ambiente.sacvefor.rue.service;
 
 import java.util.Set;
@@ -32,8 +28,10 @@ public class ApplicationConfig extends Application {
         resources.add(ar.gob.ambiente.sacvefor.rue.service.MarcaFacadeREST.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.ModeloFacadeREST.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.PersonaFacadeREST.class);
+        resources.add(ar.gob.ambiente.sacvefor.rue.service.RestSecurityFilter.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.TipoEntidadFacadeREST.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.TipoSociedadFacadeREST.class);
+        resources.add(ar.gob.ambiente.sacvefor.rue.service.UsuarioResource.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.VehiculoFacadeREST.class);
     }
     
