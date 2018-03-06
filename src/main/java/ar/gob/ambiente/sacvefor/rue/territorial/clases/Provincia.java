@@ -13,17 +13,33 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement(name = "provincia")
 public class Provincia implements Serializable {
 
+    /**
+     * Variable privada: Long identificación de la Provincia
+     */    
     private Long id;
+    
+    /**
+     * Variable privada: String nombre de la Provincia
+     */
     private String nombre;      
     
     /******************
      * Constructores **
      ******************/   
+    
+    /**
+     * Constructor con los valores por defecto
+     */
     public Provincia(){
         this.id = Long.valueOf(0);
         this.nombre = "dafault";
     }   
     
+    /**
+     * Constructor que instancia la clase con parámetros
+     * @param id Long identificador de la Provincia
+     * @param nombre String nombre de la Provincia
+     */
     public Provincia(Long id, String nombre){
         this.id = id;
         this.nombre = nombre;

@@ -1,6 +1,7 @@
 
 package ar.gob.ambiente.sacvefor.rue.service;
 
+import ar.gob.ambiente.sacvefor.rue.annotation.Secured;
 import ar.gob.ambiente.sacvefor.rue.enitites.Domicilio;
 import ar.gob.ambiente.sacvefor.rue.enitites.Persona;
 import ar.gob.ambiente.sacvefor.rue.enitites.TipoEntidad;
@@ -46,12 +47,75 @@ public class PersonaFacadeREST {
     UriInfo uriInfo;    
 
     /**
-     * Método para crear una Persona.
-     * Este método se podrá ejecutar si previamente findByQuery() con el cuit como parámentro, devuelve nulo
-     * @param entity: La Persona a persistir proveniente del paqRue compartido
-     * @return : la uri de acceso a la Persona generada
-     */    
+     * @api {post} /personas Registrar una Persona
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X POST -d [PATH_SERVER]/rue/rest/personas -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName PostPersona
+     * @apiGroup Persona
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiParam {ar.gob.ambiente.sacvefor.servicios.rue.Persona} entity Objeto java del paquete paqRue.jar con los datos de la Persona a registrar
+     * @apiParamExample {java} Ejemplo de Persona
+     *      {"entity":{"id": "0",
+     *          "correoelectronico": "persona_2@correo.com",
+     *          "cuit": "27031902222",
+     *          "fechaalta": "17-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "nombrecompleto": "",
+     *          "provinciagestion": "SANTIAGO DEL ESTERO",
+     *          "razonsocial": "LAS GRAPIAS S.A.",
+     *          "strusuario": "ADMINISTRADOR CENTRAL",
+     *          "tipo": "JURIDICA",
+     *          "domicilio":
+     *              {
+     *                  "id": "5",
+     *                  "calle": "OTILIAS",
+     *                  "departamento": "COMUNA 10",
+     *                  "depto": "B",
+     *                  "idlocalidadgt": "10835",
+     *                  "localidad": "VERSALLES - BARRIO",
+     *                  "numero": "569",
+     *                  "piso": "3",
+     *                  "provincia": "CIUDAD AUTONOMA DE BUENOS AIRES",
+     *                  "strusuario": "ADMINISTRADOR CENTRAL"
+     *              },
+     *          "tipoentidad":
+     *              {
+     *                  "id": "2",
+     *                  "nombre": "PRODUCTOR"
+     *              },
+     *          "tiposociedad":
+     *              {
+     *                  "id": "1",
+     *                  "nombre": "SOCIEDAD ANONIMA",
+     *                  "sigla": "SA"
+     *              }
+     *          }
+     *      }
+     * @apiDescription Método para registrar una nueva Persona. Instancia una entidad a persistir Persona local y la crea mediante el método local create(Persona persona) 
+     * @apiSuccess {String} Location url de acceso mediante GET al Persona registrada.
+     * @apiSuccessExample Response exitosa:
+     *     HTTP/1.1 201 OK
+     *     {
+     *       {
+     *          "Location": "[PATH_SERVER]/rue/rest/personas/:id"
+     *       }
+     *     }
+     *
+     * @apiError PersonaNoRegistrado No se registró la Persona.
+     * @apiErrorExample Respuesta de Error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "Hubo un error procesando la inserción en el Registro Unico"
+     *     }
+     */        
     @POST
+    @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response create(ar.gob.ambiente.sacvefor.servicios.rue.Persona entity) {
         // instancio la entidad
@@ -71,15 +135,62 @@ public class PersonaFacadeREST {
     }
 
     /**
-     * Método para editar una Persona existente
-     * Este método se podrá ejecutar si findByQuery() con el cuit como parámentro, previamente devuelve nulo o
-     * una Persona con el mismo id de la que se está editando
-     * @param id : id de la Persona a actualizar
-     * @param entity : La Persona a actualizar proveniente del paqRue compartido
-     * @return 
-     */    
+     * @api {put} /personas/:id Actualizar una Persona existente
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X PUT -d [PATH_SERVER]/rue/rest/personas/1 -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName PutPersona
+     * @apiGroup Persona
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiParam {ar.gob.ambiente.sacvefor.servicios.rue.Persona} entity Objeto java del paquete paqRue.jar con los datos de la Persona a actualizar
+     * @apiParam {Long} Id Identificador único de la Persona a actualizar
+     * @apiParamExample {java} Ejemplo de Persona
+     *      {"entity": {"id": "1",
+     *          "correoelectronico": "persona@correo.com",
+     *          "cuit": "27031901111",
+     *          "fechaalta": "09-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "10",
+     *          "nombrecompleto": "TROILO, ANIBAL CARMELO",
+     *          "provinciagestion": "JUJUY",
+     *          "razonsocial": "",
+     *          "strusuario": "ADMINISTRADOR CENTRAL",
+     *          "tipo": "FISICA",
+     *          "domicilio":
+     *              {},
+     *          "tipoentidad":
+     *              {
+     *                  "id": "2",
+     *                  "nombre": "PRODUCTOR"
+     *              },
+     *          "tiposociedad":
+     *              {}
+     *          }
+     *      }
+     * @apiParamExample {json} Emplo de id
+     *      {
+     *          "id": "1"
+     *      }
+     * @apiDescription Método para actualizar una Persona existente. Obtiene la Persona correspondiente al id recibido 
+     * mediante el método local find(Long id), actualiza sus datos según los de la entidad recibida y la edita mediante 
+     * el método local edit(Persona persona).
+     * @apiSuccessExample Response exitosa:
+     *     HTTP/1.1 200 OK
+     *     {}
+     * @apiError PersonaNoActualizada No se actualizó la Persona.
+     * @apiErrorExample Respuesta de Error:
+     *     HTTP/1.1 400 Not Modified
+     *     {
+     *       "error": "Hubo un error procesado la actualización en el Registro Unico."
+     *     }
+     */       
     @PUT
     @Path("{id}")
+    @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response edit(@PathParam("id") Long id, ar.gob.ambiente.sacvefor.servicios.rue.Persona entity) {
         // instancio la entidad
@@ -97,41 +208,223 @@ public class PersonaFacadeREST {
     }
 
     /**
-     * Método para obtener la Persona correspondiente al id recibido
-     * Ej: [PATH]/personas/1
-     * @param id: id de la Marca a obtener
-     * @return
-     */    
+     * @api {get} /personas/:id Ver una Persona
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X GET -d [PATH_SERVER]/rue/rest/personas/1 -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName GetPersona
+     * @apiGroup Persona
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiParam {Long} id Identificador único de la Persona
+     * @apiDescription Método para obtener una Persona existente según el id remitido.
+     * Obtiene la Persona mediante el método local find(Long id)
+     * @apiSuccess {ar.gob.ambiente.sacvefor.servicios.rue.Persona} Persona Detalle de la persona registrada.
+     * @apiSuccessExample Respuesta exitosa:
+     *     HTTP/1.1 200 OK
+     *      {
+     *          "id": "1",
+     *          "correoelectronico": "persona@correo.com",
+     *          "cuit": "27031901111",
+     *          "fechaalta": "09-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "10",
+     *          "nombrecompleto": "TROILO, ANIBAL CARMELO",
+     *          "provinciagestion": "JUJUY",
+     *          "razonsocial": "",
+     *          "strusuario": "ADMINISTRADOR CENTRAL",
+     *          "tipo": "FISICA",
+     *          "domicilio":
+     *              {},
+     *          "tipoentidad":
+     *              {
+     *                  "id": "2",
+     *                  "nombre": "PRODUCTOR"
+     *              },
+     *          "tiposociedad":
+     *              {}
+     *      }
+     * @apiError MarcaNotFound No existe persona registrada con ese id.
+     * @apiErrorExample Respuesta de error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "No hay persona registrada con el id recibido"
+     *     }
+     */     
     @GET
     @Path("{id}")
+    @Secured
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Persona find(@PathParam("id") Long id) {
         return personaFacade.find(id);
     }
 
     /**
-     * Método que retorn todas las Personas registradas
-     * Ej: [PATH]/personas
-     * @return 
-     */
+     * @api {get} /personas Ver todas las Personas
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X GET -d [PATH_SERVER]/rue/rest/personas -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName GetPersonas
+     * @apiGroup Persona
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiDescription Método para obtener un listado de las Personas existentes.
+     * Obtiene las marcas mediante el método local findAll()
+     * @apiSuccess {ar.gob.ambiente.sacvefor.servicios.rue.Persona} Persona Listado con todos las Personas registradas.
+     * @apiSuccessExample Respuesta exitosa:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "Personas": [
+     *          {"id": "1",
+     *          "correoelectronico": "persona@correo.com",
+     *          "cuit": "27031901111",
+     *          "fechaalta": "09-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "10",
+     *          "nombrecompleto": "TROILO, ANIBAL CARMELO",
+     *          "provinciagestion": "JUJUY",
+     *          "razonsocial": "",
+     *          "strusuario": "ADMINISTRADOR CENTRAL",
+     *          "tipo": "FISICA",
+     *          "domicilio":
+     *              {},
+     *          "tipoentidad":
+     *              {
+     *                  "id": "2",
+     *                  "nombre": "PRODUCTOR"
+     *              },
+     *          "tiposociedad":
+     *              {}
+     *          },
+     *          {"id": "1",
+     *          "correoelectronico": "persona_2@correo.com",
+     *          "cuit": "27031902222",
+     *          "fechaalta": "17-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "nombrecompleto": "",
+     *          "provinciagestion": "SANTIAGO DEL ESTERO",
+     *          "razonsocial": "LAS GRAPIAS S.A.",
+     *          "strusuario": "ADMINISTRADOR CENTRAL",
+     *          "tipo": "JURIDICA",
+     *          "domicilio":
+     *              {
+     *                  "id": "5",
+     *                  "calle": "OTILIAS",
+     *                  "departamento": "COMUNA 10",
+     *                  "depto": "B",
+     *                  "idlocalidadgt": "10835",
+     *                  "localidad": "VERSALLES - BARRIO",
+     *                  "numero": "569",
+     *                  "piso": "3",
+     *                  "provincia": "CIUDAD AUTONOMA DE BUENOS AIRES",
+     *                  "strusuario": "ADMINISTRADOR CENTRAL"
+     *              },
+     *          "tipoentidad":
+     *              {
+     *                  "id": "2",
+     *                  "nombre": "PRODUCTOR"
+     *              },
+     *          "tiposociedad":
+     *              {
+     *                  "id": "1",
+     *                  "nombre": "SOCIEDAD ANONIMA",
+     *                  "sigla": "SA"
+     *              }
+     *          }
+     *       ]
+     *     }
+     * @apiError PersonasNotFound No existen Personas registradas.
+     * @apiErrorExample Respuesta de error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "No hay Personas registradas"
+     *     }
+     */         
     @GET
+    @Secured
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Persona> findAll() {
         return personaFacade.findAll();
     }
-    
+
     /**
-     * Método que, según los parámetros recibidos ejecuta uno u otro método
-     * @param cuit: con el CUIT devuelve un listado con la Persona correspondiente al CUIT ingresado:
-     * Ej: [PATH]/personas/query?cuit=20339210315
-     * @param hab: con hab en true, si tiene también 'tipo' con algún valor trae las Personas habilitadas del tipo que corresponda:
-     * Ej: [PATH]/personas/query?hab=true&tipo=FISICA
-     * @param tipo: con el parámetro tipo, devuelve todas las Personas (habilitadas o no), del Tipo recibido como parámetro.
-     * Ej: [PATH]/personas/query?tipo=FISICA
-     * @return 
-     */    
+     * @api {get} /personas/query?cuit=:cuit,hab=:hab,tipo=:tipo Ver Persona según parámetros.
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X GET -d [PATH_SERVER]/rue/rest/personas/query?cuit=27031902222 -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName GetPersonaQuery
+     * @apiGroup Persona
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     }
+     * @apiParam {String} cuit Cuit de la Persona
+     * @apiParam {String} hab Habilitación de la Persona
+     * @apiParam {String} tipo tipo de Persona (FISICA o JURIDICA)
+     * @apiDescription Método para obtener una Persona según su cuit o según si está o no habilitado, o según el tipo (FISICA o JURIDICA).
+     * Solo uno de los parámetros tendrá un valor y los restantes nulos.
+     * Según el caso, obtiene el o los vehículos en cuestión con los métodos locales getExistente(Long cuit), getHabilitadas() o getJuridicasHab()
+     * @apiSuccess {ar.gob.ambiente.sacvefor.servicios.rue.Persona} Persona Detalle de la persona registrada.
+     * @apiSuccessExample Respuesta exitosa:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "Vehiculos": [
+     *          {"id": "1",
+     *          "correoelectronico": "persona_2@correo.com",
+     *          "cuit": "27031902222",
+     *          "fechaalta": "17-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "nombrecompleto": "",
+     *          "provinciagestion": "SANTIAGO DEL ESTERO",
+     *          "razonsocial": "LAS GRAPIAS S.A.",
+     *          "strusuario": "ADMINISTRADOR CENTRAL",
+     *          "tipo": "JURIDICA",
+     *          "domicilio":
+     *              {
+     *                  "id": "5",
+     *                  "calle": "OTILIAS",
+     *                  "departamento": "COMUNA 10",
+     *                  "depto": "B",
+     *                  "idlocalidadgt": "10835",
+     *                  "localidad": "VERSALLES - BARRIO",
+     *                  "numero": "569",
+     *                  "piso": "3",
+     *                  "provincia": "CIUDAD AUTONOMA DE BUENOS AIRES",
+     *                  "strusuario": "ADMINISTRADOR CENTRAL"
+     *              },
+     *          "tipoentidad":
+     *              {
+     *                  "id": "2",
+     *                  "nombre": "PRODUCTOR"
+     *              },
+     *          "tiposociedad":
+     *              {
+     *                  "id": "1",
+     *                  "nombre": "SOCIEDAD ANONIMA",
+     *                  "sigla": "SA"
+     *              }
+     *          }
+     *       ]
+     *     }
+     * @apiError MarcaNotFound No existe persona registrado con esos parámetros.
+     * @apiErrorExample Respuesta de error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "No hay persona registrada con los parámetros recibidos"
+     *     }
+     */       
     @GET
     @Path("/query")
+    @Secured
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Persona> findByQuery(@QueryParam("cuit") Long cuit, @QueryParam("hab") boolean hab, @QueryParam("tipo") String tipo) {
         List<Persona> result = new ArrayList<>();
@@ -161,13 +454,6 @@ public class PersonaFacadeREST {
         return result;
     }
 
-    /**
-     * Método que obtiene un listado de Personas cuyos id se encuentran entre los parámetros de inicio y fin recibidos
-     * Ej: [PATH]/personas/1/10
-     * @param from: parámetro 'desde' el cual se inicia el listado
-     * @param to: parámetro 'hasta' el cual se completa el listado
-     * @return 
-     */    
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
@@ -175,11 +461,6 @@ public class PersonaFacadeREST {
         return personaFacade.findRange(new int[]{from, to});
     }
 
-    /**
-     * Método que devuelve un entero con la totalidad de las Personas registradas
-     * Ej: [PATH]/personas/count
-     * @return 
-     */    
     @GET
     @Path("count")
     @Produces(MediaType.TEXT_PLAIN)

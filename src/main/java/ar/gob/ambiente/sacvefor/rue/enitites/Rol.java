@@ -22,15 +22,23 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Rol implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * Variable privada: Identificador único
+     */  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    /**
+     * Variable privada: Nombre del rol del usuario
+     */ 
     @Column (nullable=false, length=20, unique=true)
     @NotNull(message = "El campo nombre no puede ser nulo")
     @Size(message = "El campo nombre no puede tener más de 20 caracteres", min = 1, max = 20)
     private String nombre;    
 
+    
     public String getNombre() {
         return nombre;
     }
@@ -47,6 +55,10 @@ public class Rol implements Serializable {
         this.id = id;
     }
 
+    /**
+     * Método que crea un hash con a partir de la id del rol
+     * @return int Un entero con el hash
+     */      
     @Override
     public int hashCode() {
         int hash = 0;
@@ -54,6 +66,11 @@ public class Rol implements Serializable {
         return hash;
     }
 
+    /**
+     * Método que compara una instancia de Rol con otra según su id
+     * @param object La instancia de Rol a comparar con la presente
+     * @return boolean Verdadero si son iguales, falso si son distintas
+     */     
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -67,6 +84,10 @@ public class Rol implements Serializable {
         return true;
     }
 
+    /**
+     * Método que devuelve un String con el id del Rol
+     * @return String id del Rol en formato String
+     */           
     @Override
     public String toString() {
         return "ar.gob.ambiente.sacvefor.rue.enitites.Rol[ id=" + id + " ]";

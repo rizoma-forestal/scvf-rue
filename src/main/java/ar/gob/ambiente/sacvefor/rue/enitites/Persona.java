@@ -41,12 +41,16 @@ import static org.hibernate.envers.RelationTargetAuditMode.NOT_AUDITED;
 public class Persona implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * Variable privada: Identificador único
+     */  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
     /**
-     * Identificación de la provincia que gestionó (alta o modificaciones)
+     * Variable privada: Identificación de la provincia que gestionó (alta o modificaciones)
      * al vehículo. Esta identificación hará referencia a la provincia del
      * servicio gestion territorial.
      */
@@ -54,22 +58,33 @@ public class Persona implements Serializable {
     private Long idProvinciaGt;
     
     /**
-     * Nombre de la Provincia de origen de la carga.
+     * Variable privada: Nombre de la Provincia de origen de la carga.
      * Proveniente del usuario de registro
      */
     @Column (length=30)
     @Size(message = "El campo provinciaGestion no puede tener más de 30 caracteres", max = 30)
     private String provinciaGestion;
 
+    /**
+     * Variable privada: Tipo de persona (FISICA o JURIDICA)
+     */
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo")
     private TipoPersona tipo;    
     
+    /**
+     * Variable privada: Tipo de sociedad, solo para las personas jurídicas
+     * Ej. Sociedad anónima, Sociedad de Responsabilidad limitada, etc.
+     */
     @Audited(targetAuditMode = NOT_AUDITED)
     @ManyToOne
     @JoinColumn(name="tiposociedad_id")
     private TipoSociedad tipoSociedad;     
 
+    /**
+     * Variable privada: Tipo de Entidad, se refiere al rol de la Persona en el componente local que lo registra
+     * Ej: Productor, Empresa de transporte, Empresa exportadora, etc.
+     */
     @Audited(targetAuditMode = NOT_AUDITED)
     @ManyToOne
     @JoinColumn(name="tipoentidad_id", nullable=false)
@@ -77,61 +92,92 @@ public class Persona implements Serializable {
     private TipoEntidad entidad; 
     
     /**
-     * En los casos de las razones sociales será el domicilio legal, en el caso de 
+     * Variable privada: En los casos de las razones sociales será el domicilio legal, en el caso de 
      * productores y titulares que sean personas físicas, será su domicilio real,
      * en el caso de choferes, por ejemplo, no será necesario domicilio alguno.
+     * Solo para las personas de tipo "Transformador" los domicilios serán obligatorios, dado que son destinatarios de Guías.
      */
     @OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
     private Domicilio domicilio;      
     
+    /**
+     * Variable privada: Nombres y apellidos completos de la persona.
+     * Solo para las personas físicas
+     */
     @Column (length=100)
     @Size(message = "El campo nombreCompleto no puede tener más de 100 caracteres", max = 100)
     private String nombreCompleto;  
     
+    /**
+     * Variable privada: Nombre de la Razón social, solo para personas jurídicas
+     */
     @Column (length=200)
     @Size(message = "El campo razonSocial no puede tener más de 200 caracteres", max = 200)
     private String razonSocial;   
     
+    /**
+     * Variable privada: Cuit de la persona
+     */
     @Column (nullable=false, unique=true)
     @NotNull(message = "El campo cuit no puede ser nulo")
     private Long cuit;
     
+    /**
+     * Variable privada: correo electrónico de la persona
+     */
     @Column (length=100)
     @Size(message = "El campo correoElectronico no puede tener más de 100 caracteres", max = 100)
     private String correoElectronico;       
     
+    /**
+     * Variable privada: Listado de vehículos vinculados a la persona.
+     * Solo para las empresas de transporte.
+     */
     @OneToMany(mappedBy="empresa")
     private List<Vehiculo> vehiculos;    
     
     /**
-     * Usuario que gestiona la persona, tanto en el alta como en las modificaciones que pudiera tener
+     * Variable privada: Usuario que gestiona la persona, tanto en el alta como en las modificaciones que pudiera tener
      */
     @ManyToOne
     @JoinColumn(name="usuario_id")
     private Usuario usuario; 
     
     /**
-     * campo que cachea el nombre del usuario de gestión
+     * Variable privada: campo que cachea el nombre del usuario de gestión
      */
     private String strUsuario;
 
     /**
+     * Variable privada: Fecha de registro de la persona.
      * Solo se insertará al dar de alta a la persona, no volverá a actualizarse
-     * La fecha de actualizaciones de la persona se registrarán en la entidad de auditría
+     * La fecha de actualizaciones de la persona se registrarán en la entidad de auditoría
      */
     @Temporal(javax.persistence.TemporalType.DATE)
     private Date fechaAlta; 
     
+    /**
+     * Variable privada no persistida: Muestra la fecha de la revisión 
+     * para cada item del listado de revisiones de una Persona.
+     */
     @Transient
     private Date fechaRevision;     
 
+    /**
+     * Variable privada: Condición de habilitado
+     */
     @Column
     private boolean habilitado;    
     
     public Persona() {
         vehiculos = new ArrayList<>();
     }    
-
+      
+    /**
+     * Método que devuelve la fecha de una revisión de la Persona.
+     * No disponible para la API rest
+     * @return Date fecha de la revisión
+     */
     @XmlTransient
     public Date getFechaRevision() {
         return fechaRevision;
@@ -141,6 +187,11 @@ public class Persona implements Serializable {
         this.fechaRevision = fechaRevision;
     }
 
+    /**
+     * Método que devuelve el nombre del usuario de gestión
+     * No disponible para la API rest
+     * @return String nombre del usuario
+     */        
     @XmlTransient
     public String getStrUsuario() {
         return strUsuario;
@@ -230,6 +281,11 @@ public class Persona implements Serializable {
         this.correoElectronico = correoElectronico;
     }
 
+    /**
+     * Método que devuelve el listado de los Vehículos vinculados a la Persona
+     * No disponible para la API rest
+     * @return List<Vehiculo> Listado de Vehículos
+     */        
     @XmlTransient
     public List<Vehiculo> getVehiculos() {
         return vehiculos;
@@ -239,6 +295,11 @@ public class Persona implements Serializable {
         this.vehiculos = vehiculos;
     }
 
+    /**
+     * Método que devuelve el usuario de gestión de la Persona
+     * No disponible para la API rest
+     * @return Usuario Usuario de gestión
+     */        
     @XmlTransient
     public Usuario getUsuario() {
         return usuario;
@@ -256,6 +317,11 @@ public class Persona implements Serializable {
         this.fechaAlta = fechaAlta;
     }
 
+    /**
+     * Método que indica si la Persona está o no habilitada
+     * No disponible para la API rest
+     * @return boolean true o false, según corresponda
+     */        
     @XmlTransient
     public boolean isHabilitado() {
         return habilitado;
@@ -274,6 +340,10 @@ public class Persona implements Serializable {
         this.id = id;
     }
 
+    /**
+     * Método que crea un hash con a partir de la id de la entidad
+     * @return int Un entero con el hash
+     */         
     @Override
     public int hashCode() {
         int hash = 0;
@@ -281,6 +351,11 @@ public class Persona implements Serializable {
         return hash;
     }
 
+    /**
+     * Método que compara una instancia de esta entidad con otra según su id
+     * @param object La instancia de entidad a comparar con la presente
+     * @return boolean Verdadero si son iguales, falso si son distintas
+     */         
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -294,6 +369,10 @@ public class Persona implements Serializable {
         return true;
     }
 
+    /**
+     * Método que devuelve un String con el id de la entidad
+     * @return String id de la entidad en formato String
+     */           
     @Override
     public String toString() {
         return "ar.gob.ambiente.sacvefor.rue.enitites.Persona[ id=" + id + " ]";

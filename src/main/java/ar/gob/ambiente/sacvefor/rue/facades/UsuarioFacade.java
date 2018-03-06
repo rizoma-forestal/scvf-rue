@@ -13,28 +13,38 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 
 /**
- *
+ * Clase que implementa la abstracta para el acceso a datos de la entidad Usuario.
  * @author rincostante
  */
 @Stateless
 public class UsuarioFacade extends AbstractFacade<Usuario> {
 
+    /**
+     * Variable privada: EntityManager al que se le indica la unidad de persistencia mediante la cual accederá a la base de datos
+     */      
     @PersistenceContext(unitName = "svf_ruePU")
     private EntityManager em;
 
+    /**
+     * Método que implementa el abstracto para la obtención del EntityManager
+     * @return EntityManager para acceder a datos
+     */        
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Cosntructor
+     */
     public UsuarioFacade() {
         super(Usuario.class);
     }
     
     /**
      * Método para verificar la existencia de Usuarios referidos por algún Vehículo, Persona o Domicilio.
-     * @param usuario
-     * @return Si no existen ninguna devuelve false, si no true
+     * @param usuario Usuario del cual se buscan las referencias
+     * @return boolean Si no existen ninguna devuelve false, si no true
      */
     public boolean esReferenciado(Usuario usuario){
         boolean result = false;
@@ -73,9 +83,9 @@ public class UsuarioFacade extends AbstractFacade<Usuario> {
     }    
     
     /**
-     * Método para obtener un Modelo según su nombre, si existe
-     * @param nombre
-     * @return 
+     * Método para obtener un Usuario según su nombre, si existe
+     * @param nombre String nombre del Usuario
+     * @return Usuario el Usuario buscado o null, en caso de no existir
      */
     public Usuario getExistente(String nombre) {
         List<Usuario> lstUsuarios;
@@ -96,7 +106,7 @@ public class UsuarioFacade extends AbstractFacade<Usuario> {
     /**
      * Método que devuelve las Usuarios habilitados
      * Sin distinción del tipo.
-     * @return 
+     * @return List<Usuario> listado de los usuarios habilitados
      */
     public List<Usuario> getHabilitados(){
         List<Usuario> lstUsuarios;
@@ -110,6 +120,10 @@ public class UsuarioFacade extends AbstractFacade<Usuario> {
         return lstUsuarios;
     }    
     
+    /**
+     * Método de AbstractFacade sobreescrito para que devuelva todos los usurios ordenados alfabeticamente por su nombre completo
+     * @return List<Usuario> listado de todos los usuarios ordenados
+     */
     @Override
     public List<Usuario> findAll(){
         em = getEntityManager();
@@ -121,8 +135,8 @@ public class UsuarioFacade extends AbstractFacade<Usuario> {
     
     /**
      * Método para obtener el Usuario para la API REST de la Provincia cuyo id se recibe
-     * @param idProv : id de la Provincia en el Servicio Territorial
-     * @return 
+     * @param idProv Long id de la Provincia en el Servicio Territorial
+     * @return Usuario Usuario de la Provincia cuyo id se recibe o null si no existe
      */
     public Usuario getByProvincia(Long idProv){
         List<Usuario> lstUsuarios;
@@ -141,9 +155,24 @@ public class UsuarioFacade extends AbstractFacade<Usuario> {
     }
     
     /**
+     * Método que valida que el usuario recibido está registrado como usuario de la API
+     * @param nombre String Nombre del usuario recibido, enviado por le cliente.
+     * @return boolean Verdadero o falso según el caso
+     */
+    public boolean validarUsuarioApi(String nombre){
+        em = getEntityManager();
+        String queryString = "SELECT us FROM Usuario us "
+                + "WHERE us.nombre = :nombre "
+                + "AND us.rol.nombre = 'API'";
+        Query q = em.createQuery(queryString)
+                .setParameter("nombre", nombre);
+        return !q.getResultList().isEmpty();
+    }    
+    
+    /**
      * Método para obtener todas las revisiones de la entidad
-     * @param nombreAud
-     * @return 
+     * @param nombreAud String nombre del usuario a consultar sus revisiones
+     * @return List<Usuario> Listado de las revisiones del Usuario cuyo nombre se recibió
      */
     public List<Usuario> findRevisions(String nombreAud){
         List<Usuario> lstClientes = new ArrayList<>();

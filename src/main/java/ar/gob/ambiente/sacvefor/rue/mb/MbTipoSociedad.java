@@ -18,12 +18,25 @@ import javax.faces.convert.FacesConverter;
  */
 public class MbTipoSociedad {
 
+    /**
+     * Variable privada: TipoSociedad Entidad que se gestiona mediante el bean
+     */    
     private TipoSociedad tipoSociedad;
+    
+    /**
+     * Variable privada: List<TipoSociedad> listado de los tipos de entidades registrados que compone la tabla para su gestión
+     */
     private List<TipoSociedad> lstTipoSociedades;
     
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de TipoSociedad
+     */  
     @EJB
     private TipoSociedadFacade tipoSociedadFacade;
     
+    /**
+     * Constructor
+     */
     public MbTipoSociedad() {
     }
 
@@ -38,6 +51,10 @@ public class MbTipoSociedad {
         this.tipoSociedad = tipoSociedad;
     }
 
+    /**
+     * Método para obtener los Tipos de Sociedades existentes y poblar el listado correspondiente
+     * @return List<TipoSociedad> listado con los Tipos de Sociedades existentes
+     */
     public List<TipoSociedad> getLstTipoSociedades() {
         lstTipoSociedades = tipoSociedadFacade.findAll();
         return lstTipoSociedades;
@@ -51,6 +68,10 @@ public class MbTipoSociedad {
     /***********************
      * Mátodos operativos **
      ***********************/
+    
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa la entidad a gestionar
+     */ 
     @PostConstruct
     public void init() {
         tipoSociedad = new TipoSociedad();
@@ -121,7 +142,13 @@ public class MbTipoSociedad {
     
     /*********************
      * Métodos privados **
-     *********************/     
+     *********************/   
+    
+    /**
+     * Método privado que recupera un TipoSociedad según su id
+     * @param key Long id de la entidad persistida
+     * @return Object la entidad correspondiente
+     */  
     private Object getTipoSociedad(Long key) {
         return tipoSociedadFacade.find(key);
     }

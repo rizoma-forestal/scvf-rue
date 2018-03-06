@@ -10,28 +10,38 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 
 /**
- *
+ * Clase que implementa la abstracta para el acceso a datos de la entidad Rol.
  * @author rincostante
  */
 @Stateless
 public class RolFacade extends AbstractFacade<Rol> {
 
+    /**
+     * Variable privada: EntityManager al que se le indica la unidad de persistencia mediante la cual accederá a la base de datos
+     */         
     @PersistenceContext(unitName = "svf_ruePU")
     private EntityManager em;
 
+    /**
+     * Método que implementa el abstracto para la obtención del EntityManager
+     * @return EntityManager para acceder a datos
+     */        
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Constructor
+     */
     public RolFacade() {
         super(Rol.class);
     }
     
     /**
      * Método para verificar la existencia de Roles referidas por algún Usuario.
-     * @param rol
-     * @return Si no existen ninguna devuelve false, si no true
+     * @param rol Rol cuyos usuarios se consultan
+     * @return boolen Si no existen ninguna devuelve false, si no true
      */
     public boolean esReferenciada(Rol rol){
         List<Usuario> lstUsuarios;
@@ -47,8 +57,8 @@ public class RolFacade extends AbstractFacade<Rol> {
     
     /**
      * Método para obtener un Rol según su nombre, si existe
-     * @param nombre
-     * @return 
+     * @param nombre String nombre del usuario consultado
+     * @return Rol Rol cuyo nombre se busca
      */
     public Rol getExistente(String nombre) {
         List<Rol> lstRoles;
