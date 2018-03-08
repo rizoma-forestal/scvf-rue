@@ -7,7 +7,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 
 /**
- * Cliente REST Jersey generado para el recurso DepartamentoFacadeREST de la API Territorial
+ * Cliente REST Jersey generado para el recurso DepartamentoFacadeREST de la API Territorial<br>
  * [departamentos]<br>
  * USAGE:
  * <pre>

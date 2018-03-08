@@ -7,7 +7,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
 
 /**
- * Cliente REST Jersey generado para el recurso CentroPobladoFacadeREST de la API Territorial
+ * Cliente REST Jersey generado para el recurso CentroPobladoFacadeREST de la API Territorial<br>
  * [centrospoblados]<br>
  * USAGE:
  * <pre>
