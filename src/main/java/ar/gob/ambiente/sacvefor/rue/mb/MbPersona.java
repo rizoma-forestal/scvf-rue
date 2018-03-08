@@ -18,12 +18,16 @@ import ar.gob.ambiente.sacvefor.rue.territorial.clases.Provincia;
 import ar.gob.ambiente.sacvefor.rue.territorial.clientes.CentroPobladoClient;
 import ar.gob.ambiente.sacvefor.rue.territorial.clientes.DepartamentoClient;
 import ar.gob.ambiente.sacvefor.rue.territorial.clientes.ProvinciaClient;
+import ar.gob.ambiente.sacvefor.rue.territorial.clientes.UsuarioClient;
 import ar.gob.ambiente.sacvefor.rue.tipos.TipoPersona;
 import ar.gob.ambiente.sacvefor.rue.util.EntidadServicio;
 import ar.gob.ambiente.sacvefor.rue.util.JsfUtil;
+import ar.gob.ambiente.sacvefor.rue.util.Token;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -36,6 +40,7 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.validator.ValidatorException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 /**
@@ -150,6 +155,14 @@ public class MbPersona {
      * Variable privada: CentroPobladoClient Cliente para la API REST de Localidades del servicio de organización territorial
      */
     private CentroPobladoClient centroPobClient;
+    
+    /**
+     * Variable privada: UsuarioClient Cliente para la API REST de autenticación de usuarios del servicio de organización territorial
+     */
+    private UsuarioClient usuarioClient;
+    
+    private Token token;
+    private String strToken;    
     
     /***************************************************************************************
      * Campos para la gestión de los elementos territoriales en los combos del formulario. *
@@ -641,6 +654,16 @@ public class MbPersona {
         List<Departamento> listSrv;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             provClient = new ProvinciaClient();
             // obtngo el listado
@@ -671,6 +694,16 @@ public class MbPersona {
         List<CentroPoblado> listSrv;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             deptoClient = new DepartamentoClient();
             // obtngo el listado
@@ -701,6 +734,16 @@ public class MbPersona {
         CentroPoblado cp;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             centroPobClient = new CentroPobladoClient();
             cp = centroPobClient.find_JSON(CentroPoblado.class, String.valueOf(idLocalidad));
@@ -780,6 +823,16 @@ public class MbPersona {
         List<Provincia> listSrv;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             provClient = new ProvinciaClient();
             // obtengo el listado de provincias 
@@ -812,6 +865,24 @@ public class MbPersona {
     private Object getPersona(Long key) {
         return personaFacade.find(key);
     }
+    
+    /**
+     * Método privado que obtiene y setea el token para autentificarse ante la API rest de Territorial
+     * Crea el campo de tipo Token con la clave recibida y el momento de la obtención
+     */
+    private void getToken(){
+        try{
+            usuarioClient = new UsuarioClient();
+            Response responseUs = usuarioClient.authenticateUser_JSON(Response.class, ResourceBundle.getBundle("/Config").getString("UsRestTerr"));
+            MultivaluedMap<String, Object> headers = responseUs.getHeaders();
+            List<Object> lstHeaders = headers.get("Authorization");
+            strToken = (String)lstHeaders.get(0); 
+            token = new Token(strToken, System.currentTimeMillis());
+            usuarioClient.close();
+        }catch(ClientErrorException ex){
+            System.out.println("Hubo un error obteniendo el token para la API Territorial: " + ex.getMessage());
+        }
+    }     
     
     /****************************
     ** Converter para Persona  **
