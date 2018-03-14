@@ -27,9 +27,7 @@ public class UsuarioResource {
     private UsuarioFacade usFacade;    
     
     /**
-     * @param user
-     * @return 
-     * @api {get} /login/ Obtiene un Response con el token incluído en el header
+     * @api {get} /login/ Obtener token
      * @apiVersion 1.0.0
      * @apiName GetUsuario
      * @apiGroup Usuario
@@ -51,7 +49,7 @@ public class UsuarioResource {
      * @apiError UsuarioInvalido Mensaje vacío.
      *
      * @apiErrorExample Error-Response:
-     *     HTTP/1.1 404 Not Found
+     *     HTTP/1.1 404 Not Authorized
      *     {}
      */          
     @GET

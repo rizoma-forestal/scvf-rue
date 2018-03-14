@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * Cliente REST Jersey generado para el recurso CentroPobladoFacadeREST de la API Territorial<br>
@@ -58,13 +59,16 @@ public class CentroPobladoClient {
      * @param <T> Tipo genérico
      * @param responseType Tipo que en el que se setearán los datos serializados obtenidos, en este caso será CentroPoblado
      * @param id Long id del Centro poblado a obtener
+     * @param token
      * @return <T> CentroPoblado Localidad obtenida según el id remitido
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T find_XML(Class<T> responseType, String id) throws ClientErrorException {
+    public <T> T find_XML(Class<T> responseType, String id, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**
@@ -73,13 +77,16 @@ public class CentroPobladoClient {
      * @param <T> Tipo genérico
      * @param responseType Tipo que en el que se setearán los datos serializados obtenidos, en este caso será CentroPoblado
      * @param id Long id del Centro poblado a obtener
+     * @param token
      * @return <T> CentroPoblado Localidad obtenida según el id remitido
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T find_JSON(Class<T> responseType, String id) throws ClientErrorException {
+    public <T> T find_JSON(Class<T> responseType, String id, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     public <T> T findRange_XML(Class<T> responseType, String from, String to) throws ClientErrorException {
@@ -99,12 +106,15 @@ public class CentroPobladoClient {
      * GET /centrospoblados
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
+     * @param token
      * @return javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T findAll_XML(Class<T> responseType) throws ClientErrorException {
+    public <T> T findAll_XML(Class<T> responseType, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**
@@ -112,12 +122,15 @@ public class CentroPobladoClient {
      * GET /centrospoblados
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
+     * @param token
      * @return <T> javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */    
-    public <T> T findAll_JSON(Class<T> responseType) throws ClientErrorException {
+    public <T> T findAll_JSON(Class<T> responseType, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**

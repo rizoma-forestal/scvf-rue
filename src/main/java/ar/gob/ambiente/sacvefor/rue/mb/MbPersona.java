@@ -746,7 +746,7 @@ public class MbPersona {
             }
             // instancio el cliente para la selección de las provincias
             centroPobClient = new CentroPobladoClient();
-            cp = centroPobClient.find_JSON(CentroPoblado.class, String.valueOf(idLocalidad));
+            cp = centroPobClient.find_JSON(CentroPoblado.class, String.valueOf(idLocalidad), token.getStrToken());
             // cierro el cliente
             centroPobClient.close();
             // instancio las Entidades servicio
