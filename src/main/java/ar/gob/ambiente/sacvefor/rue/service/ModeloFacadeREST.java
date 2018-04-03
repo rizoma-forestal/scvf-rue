@@ -325,7 +325,7 @@ public class ModeloFacadeREST {
     @Path("{id}/vehiculos")
     @Secured
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
-    public List<Vehiculo> findModelosByMarca(@PathParam("id") Long id){
+    public List<Vehiculo> findVehiculosByModelo(@PathParam("id") Long id){
         return modeloFacade.getVehiculos(id);
     }    
 
