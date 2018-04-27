@@ -59,7 +59,7 @@ public class CentroPobladoClient {
      * @param <T> Tipo genérico
      * @param responseType Tipo que en el que se setearán los datos serializados obtenidos, en este caso será CentroPoblado
      * @param id Long id del Centro poblado a obtener
-     * @param token
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return <T> CentroPoblado Localidad obtenida según el id remitido
      * @throws ClientErrorException Excepcion a ejecutar
      */
@@ -77,7 +77,7 @@ public class CentroPobladoClient {
      * @param <T> Tipo genérico
      * @param responseType Tipo que en el que se setearán los datos serializados obtenidos, en este caso será CentroPoblado
      * @param id Long id del Centro poblado a obtener
-     * @param token
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return <T> CentroPoblado Localidad obtenida según el id remitido
      * @throws ClientErrorException Excepcion a ejecutar
      */
@@ -106,7 +106,7 @@ public class CentroPobladoClient {
      * GET /centrospoblados
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
-     * @param token
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */
@@ -122,7 +122,7 @@ public class CentroPobladoClient {
      * GET /centrospoblados
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
-     * @param token
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return <T> javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */    

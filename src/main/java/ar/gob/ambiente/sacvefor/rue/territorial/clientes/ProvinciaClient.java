@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.HttpHeaders;
 
 /**
  * Cliente REST Jersey generado para el recurso ProvinciaFacadeREST de la API Territorial<br>
@@ -58,13 +59,16 @@ public class ProvinciaClient {
      * @param <T> Tipo genérico
      * @param responseType Tipo que en el que se setearán los datos serializados obtenidos, en este caso será Provincia
      * @param id Long id del Provincia a obtener
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return <T> Provincia Provincia obtenido según el id remitido
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T find_XML(Class<T> responseType, String id) throws ClientErrorException {
+    public <T> T find_XML(Class<T> responseType, String id, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**
@@ -73,13 +77,16 @@ public class ProvinciaClient {
      * @param <T> Tipo genérico
      * @param responseType Tipo que en el que se setearán los datos serializados obtenidos, en este caso será Provincia
      * @param id Long id del Provincia a obtener
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return <T> Provincia Provincia obtenido según el id remitido
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T find_JSON(Class<T> responseType, String id) throws ClientErrorException {
+    public <T> T find_JSON(Class<T> responseType, String id, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     public <T> T findRange_XML(Class<T> responseType, String from, String to) throws ClientErrorException {
@@ -100,13 +107,16 @@ public class ProvinciaClient {
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
      * @param id String id de la Provincia
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T findByProvincia_XML(Class<T> responseType, String id) throws ClientErrorException {
+    public <T> T findByProvincia_XML(Class<T> responseType, String id, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}/departamentos", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**
@@ -115,13 +125,16 @@ public class ProvinciaClient {
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
      * @param id String id de la Provincia
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T findByProvincia_JSON(Class<T> responseType, String id) throws ClientErrorException {
+    public <T> T findByProvincia_JSON(Class<T> responseType, String id, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
         resource = resource.path(java.text.MessageFormat.format("{0}/departamentos", new Object[]{id}));
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**
@@ -129,12 +142,15 @@ public class ProvinciaClient {
      * GET /provincias
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T findAll_XML(Class<T> responseType) throws ClientErrorException {
+    public <T> T findAll_XML(Class<T> responseType, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_XML)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**
@@ -142,12 +158,15 @@ public class ProvinciaClient {
      * GET /provincias
      * @param <T> Tipo genérico
      * @param responseType javax.ws.rs.core.Response
+     * @param token String token recibido previamente al validar el usuario en la API. Irá en el header.
      * @return javax.ws.rs.core.Response resultados de la consulta
      * @throws ClientErrorException Excepcion a ejecutar
      */
-    public <T> T findAll_JSON(Class<T> responseType) throws ClientErrorException {
+    public <T> T findAll_JSON(Class<T> responseType, String token) throws ClientErrorException {
         WebTarget resource = webTarget;
-        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON).get(responseType);
+        return resource.request(javax.ws.rs.core.MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, token)
+                .get(responseType);
     }
 
     /**

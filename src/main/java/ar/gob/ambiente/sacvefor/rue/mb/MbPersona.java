@@ -668,7 +668,7 @@ public class MbPersona {
             provClient = new ProvinciaClient();
             // obtngo el listado
             GenericType<List<Departamento>> gType = new GenericType<List<Departamento>>() {};
-            Response response = provClient.findByProvincia_JSON(Response.class, String.valueOf(idProv));
+            Response response = provClient.findByProvincia_JSON(Response.class, String.valueOf(idProv), token.getStrToken());
             listSrv = response.readEntity(gType);
             // lleno el listado de los combos
             listDepartamentos = new ArrayList<>();
@@ -708,7 +708,7 @@ public class MbPersona {
             deptoClient = new DepartamentoClient();
             // obtngo el listado
             GenericType<List<CentroPoblado>> gType = new GenericType<List<CentroPoblado>>() {};
-            Response response = deptoClient.findByDepto_JSON(Response.class, String.valueOf(idDepto));
+            Response response = deptoClient.findByDepto_JSON(Response.class, String.valueOf(idDepto), token.getStrToken());
             listSrv = response.readEntity(gType);
             // lleno el listado de los combos
             listLocalidades = new ArrayList<>();
@@ -837,7 +837,7 @@ public class MbPersona {
             provClient = new ProvinciaClient();
             // obtengo el listado de provincias 
             GenericType<List<Provincia>> gType = new GenericType<List<Provincia>>() {};
-            Response response = provClient.findAll_JSON(Response.class);
+            Response response = provClient.findAll_JSON(Response.class, token.getStrToken());
             listSrv = response.readEntity(gType);
             // lleno el list con las provincias como un objeto Entidad Servicio
             listProvincias = new ArrayList<>();
