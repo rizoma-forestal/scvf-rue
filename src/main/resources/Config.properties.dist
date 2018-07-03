@@ -1,6 +1,6 @@
 # Parámetros dinámicos de acceso a servicios
 Server=http://localhost:8080
-ServerServiciosLectura=http://localhost:8080
+ServerServicios=http://localhost:8080
 UrlTerritorial=/gestionTerritorial/rest
 
 # Usuario de acceso a API's REST de Territorial y tiempo de vigencia del token
