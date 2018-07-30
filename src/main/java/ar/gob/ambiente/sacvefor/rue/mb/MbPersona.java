@@ -18,12 +18,16 @@ import ar.gob.ambiente.sacvefor.rue.territorial.clases.Provincia;
 import ar.gob.ambiente.sacvefor.rue.territorial.clientes.CentroPobladoClient;
 import ar.gob.ambiente.sacvefor.rue.territorial.clientes.DepartamentoClient;
 import ar.gob.ambiente.sacvefor.rue.territorial.clientes.ProvinciaClient;
+import ar.gob.ambiente.sacvefor.rue.territorial.clientes.UsuarioClient;
 import ar.gob.ambiente.sacvefor.rue.tipos.TipoPersona;
 import ar.gob.ambiente.sacvefor.rue.util.EntidadServicio;
 import ar.gob.ambiente.sacvefor.rue.util.JsfUtil;
+import ar.gob.ambiente.sacvefor.rue.util.Token;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.ResourceBundle;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
@@ -36,6 +40,7 @@ import javax.faces.convert.FacesConverter;
 import javax.faces.validator.ValidatorException;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 /**
@@ -44,47 +49,159 @@ import javax.ws.rs.core.Response;
  */
 public class MbPersona {
 
+    /**
+     * Variable privada: Persona Entidad que se gestiona mediante el bean
+     */
     private Persona persona;
+    
+    /**
+     * Variable privada: List<Persona> listado de las Personas físicas registradas que compone la tabla para su gestión.
+     */
     private List<Persona> lstPerFisicas;
+    
+    /**
+     * Variable privada: List<Persona> listado de las Personas jurídicas registradas que compone la tabla para su gestión.
+     */
     private List<Persona> lstPerJuridicas;
+    
+    /**
+     * Variable privada: listado para el filtrado de las tablas de Personas
+     */
     private List<Persona> lstFilters;
+    
+    /**
+     * Variable privada: List<TipoEntidad> listado de los Tipos de Entidad disponibles para asignar a una Persona al insertar o actualizar
+     */
     private List<TipoEntidad> lstTiposEntidad;
+    
+    /**
+     * Variable privada: List<TipoSociedad> listado de los Tipos de Sociedad disponibles para asignar a una Persona jurídica al insertar o actualizar
+     */
     private List<TipoSociedad> lstTipoSociedad;
+    
+    /**
+     * Variable privada: boolean que indica que el formulario mostrado es de una vista detalle de la entidad
+     */
     private boolean view;
+    
+    /**
+     * Variable privada: boolean que indica que el formulario mostrado es de una vista de edición de una entidad existente
+     */
     private boolean edit;
+    
+    /**
+     * Variable privada: Domicilio entidad inyectada en la Persona que contiene los datos correspondientes a su domicilio
+     */
     private Domicilio domicilio;
+    
+    /**
+     * Variable privada: Logger logger que registra el log del server con resultados de operaciones de servicios
+     */
     private static final Logger logger = Logger.getLogger(Persona.class.getName());
+    
+    /**
+     * Variabla privada: List<Persona> listado de las revisiones de una persona, para su auditoría.
+     */
     private List<Persona> lstRevisions;
+    
+    /**
+     * Variable privada: Long cuit con el que se identifica a la Persona a auditar
+     */
     private Long cuitAud;
     
-    // inyección de recursos
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Persona
+     */  
     @EJB
     private PersonaFacade personaFacade;
+    
+    
     @EJB
     private TipoEntidadFacade tipoEntidadFacade;
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de TipoSociedad
+     */  
     @EJB
     private TipoSociedadFacade tipoSocFacade;
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Usuario
+     */  
     @EJB
     private UsuarioFacade usuarioFacade;
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Vehiculo
+     */  
     @EJB
     private VehiculoFacade vehiculoFacade;
     
-    // Clientes REST para la selección de datos territoriales
-    private ProvinciaClient provClient;    
+    /**********************************************************
+     * Clientes REST para la selección de datos territoriales *
+     **********************************************************/
+
+    /**
+     * Variable privada: ProvinciaClient Cliente para la API REST de Provincias del servicio de organización territorial
+     */
+    private ProvinciaClient provClient;   
+    
+    /**
+     * Variable privada: DepartamentoClient Cliente para la API REST de Departamentos del servicio de organización territorial
+     */
     private DepartamentoClient deptoClient;
+    
+    /**
+     * Variable privada: CentroPobladoClient Cliente para la API REST de Localidades del servicio de organización territorial
+     */
     private CentroPobladoClient centroPobClient;
     
     /**
-     * Campos para la gestión de los elementos territoriales en los combos del formulario.
-     * Las Entidades de servicio se componen de un par {id | nombre}
-     */ 
+     * Variable privada: UsuarioClient Cliente para la API REST de autenticación de usuarios del servicio de organización territorial
+     */
+    private UsuarioClient usuarioClient;
+    
+    private Token token;
+    private String strToken;    
+    
+    /***************************************************************************************
+     * Campos para la gestión de los elementos territoriales en los combos del formulario. *
+     * Las Entidades de servicio se componen de un par {id | nombre} ***********************
+     ***************************************************************************************/
+    
+    /**
+     * Variable privada: List<EntidadServicio> Listado de entidades de servicio con el id y nombre para las Provincias
+     */
     private List<EntidadServicio> listProvincias;
+    
+    /**
+     * Variable privada: EntidadServicio Entidad de servicio para setear los datos de la Provincia seleccionada del combo
+     */
     private EntidadServicio provSelected;
+    
+    /**
+     * Variable privada: List<EntidadServicio> Listado de entidades de servicio con el id y nombre para los Departamentos
+     */
     private List<EntidadServicio> listDepartamentos;
+    
+    /**
+     * Variable privada: EntidadServicio Entidad de servicio para setear los datos del Departamento seleccionado del combo
+     */
     private EntidadServicio deptoSelected;
+    
+    /**
+     * Variable privada: List<EntidadServicio> Listado de entidades de servicio con el id y nombre para las Localidades
+     */
     private List<EntidadServicio> listLocalidades;
+    
+    /**
+     * Variable privada: EntidadServicio Entidad de servicio para setear los datos de la Localidad seleccionado del combo
+     */
     private EntidadServicio localSelected;      
     
+    /**
+     * Constructor
+     */
     public MbPersona() {
     }
      
@@ -163,6 +280,10 @@ public class MbPersona {
         this.localSelected = localSelected;
     }
 
+    /**
+     * Método que obtiene las personas jurídicas disponibles para poblar el listado correspondiente
+     * @return List<Persona> listado de personas jurídicas
+     */
     public List<Persona> getLstPerJuridicas() {
         lstPerJuridicas = personaFacade.getJuridicas();
         return lstPerJuridicas;
@@ -180,6 +301,10 @@ public class MbPersona {
         this.persona = persona;
     }
 
+    /**
+     * Método que obtiene las personas físicas disponibles para poblar el listado correspondiente
+     * @return List<Persona> listado de personas físicas
+     */
     public List<Persona> getLstPerFisicas() {
         lstPerFisicas = personaFacade.getFisicas();
         return lstPerFisicas;
@@ -237,6 +362,11 @@ public class MbPersona {
     /***********************
      * Mátodos operativos **
      ***********************/
+    
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa las entidades a gestionar, 
+     * el listado de Tipos de Entidades disponibles, el de Tipos de sociedades disponibles y carga las provincias para su selección
+     */     
     @PostConstruct
     public void init(){
         persona = new Persona();
@@ -261,9 +391,9 @@ public class MbPersona {
     }        
     
     /**
-     * Método para guardar la Persona, sea inserción o edición.
-     * Previa validación
-     * @param tipo: parámetro que indica si es una Persona física o jurídica
+     * Método para guardar la Persona, sea inserción o edición. Previa validación.
+     * Dado que el registro se realiza mediante la interfaz administrativa, no registro el id de la Provincia
+     * @param tipo Integer parámetro que indica si es una Persona física o jurídica
      */      
     public void savePersona(Integer tipo){
         boolean valida = true;
@@ -290,11 +420,6 @@ public class MbPersona {
                     String tempRazSoc = persona.getRazonSocial();
                     persona.setRazonSocial(tempRazSoc.toUpperCase());
                 }
-                /*******************************************************************
-                 * Como el registro se realiza mediante la interfaz administrativa *
-                 * no registro Provincia *******************************************
-                 *******************************************************************/
-                
                 // seteo el Usuario de registro
                 Usuario us = usuarioFacade.find(Long.valueOf(7));
                 persona.setUsuario(us);
@@ -349,7 +474,7 @@ public class MbPersona {
     } 
     
     /**
-     * Método que setea la provPersona según el id correspondiente que la Persona tenga seteado para ser editada
+     * Método que setea los datos territoriales según el id de la localidad correspondiente que la Persona tenga seteado para editar sus datos
      */
     public void prepareEdit(){
         // si la Persona tiene un Domicilio, cargo las entidades territoriales
@@ -386,7 +511,6 @@ public class MbPersona {
      * Método para deshabilitar una Persona. Modificará su condición de habilitado a false.
      * Las Personas deshabilitadas no estarán disponibles para su selección desde el servicio.
      * Si tienen Vehículos, los mismos se deshabilitarán también.
-     * ACTUALIZAR LOS METODOS FIND en los Servicios (solo obtener los habilitados)
      */
     public void deshabilitarPersona(){
         // seteo el usuario [DEBERA ACTUALIZARSE PARA TOMAR EL USUARIO LOGEADO]
@@ -444,10 +568,10 @@ public class MbPersona {
     }  
     
     /**
-     * Método para validar el CUIT ingresado
-     * @param arg0: Contexto
-     * @param arg1: Componente
-     * @param arg2: Elemento a validar 
+     * Método para validar el CUIT ingresado. Se valida la cantidad de dígitos y el algoritmo de creación según el DNI
+     * @param arg0 FacesContext Contexto
+     * @param arg1 UIComponent Componente
+     * @param arg2 Object Elemento a validar 
      */
     public void validarCuit(FacesContext arg0, UIComponent arg1, Object arg2) throws ValidatorException{
         String cuit = String.valueOf(arg2);
@@ -489,7 +613,7 @@ public class MbPersona {
     
     /**
      * Método para validar la existencia del Nombre completo de la persona en el caso que sea física
-     * @throws ValidatorException 
+     * @throws ValidatorException Excepción a dispararse
      */
     public void validarNombreCompleto(FacesContext arg0, UIComponent arg1, Object arg2) throws ValidatorException{
         if(String.valueOf(arg2).equals("")){
@@ -499,14 +623,17 @@ public class MbPersona {
     
     /**
      * Método para validar la existencia de la Razón social de la persona en el caso que sea jurídica
-     * @throws ValidatorException 
-     */
+     * @throws ValidatorException Excepción a dispararse
+     */ 
     public void validarRazonSocial(FacesContext arg0, UIComponent arg1, Object arg2) throws ValidatorException{
         if(String.valueOf(arg2).equals("")){
             throw new ValidatorException(new FacesMessage("Debe ingresar la Razón Social."));
         }
     }     
     
+    /**
+     * Método para limpiar el formulario con los datos de la Persona
+     */
     public void limpiarForm() {
         persona = new Persona();
         domicilio = new Domicilio();
@@ -520,18 +647,28 @@ public class MbPersona {
      * Métodos privados **
      *********************/
     /**
-     * Método para poblar el listado de Departamentos según la Provincia seleccionada del servicio REST de centros poblados
+     * Método para poblar el listado de Departamentos según la Provincia seleccionada del servicio REST de centros poblados.
      */    
     private void getDepartamentosSrv(Long idProv) {
         EntidadServicio depto;
         List<Departamento> listSrv;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             provClient = new ProvinciaClient();
             // obtngo el listado
             GenericType<List<Departamento>> gType = new GenericType<List<Departamento>>() {};
-            Response response = provClient.findByProvincia_JSON(Response.class, String.valueOf(idProv));
+            Response response = provClient.findByProvincia_JSON(Response.class, String.valueOf(idProv), token.getStrToken());
             listSrv = response.readEntity(gType);
             // lleno el listado de los combos
             listDepartamentos = new ArrayList<>();
@@ -550,19 +687,28 @@ public class MbPersona {
     }
     
     /**
-     * Método para poblar el listado de Localidades según el Departamento seleccionado del servicio REST de centros poblados
+     * Método para poblar el listado de Localidades según el Departamento seleccionado del servicio REST de centros poblados.
      */
-
     private void getLocalidadesSrv(Long idDepto){
         EntidadServicio local;
         List<CentroPoblado> listSrv;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             deptoClient = new DepartamentoClient();
             // obtngo el listado
             GenericType<List<CentroPoblado>> gType = new GenericType<List<CentroPoblado>>() {};
-            Response response = deptoClient.findByDepto_JSON(Response.class, String.valueOf(idDepto));
+            Response response = deptoClient.findByDepto_JSON(Response.class, String.valueOf(idDepto), token.getStrToken());
             listSrv = response.readEntity(gType);
             // lleno el listado de los combos
             listLocalidades = new ArrayList<>();
@@ -581,15 +727,26 @@ public class MbPersona {
     }  
     
     /**
-     * Método para cargar entidades de servicio y los listados, para actualizar el Domicilio de la Persona
+     * Método privado para cargar entidades de servicio con los datos territoriales y los listados correspondientes, 
+     * para actualizar el Domicilio de la Persona. Consumido por prepareEdit()
      */
     private void cargarEntidadesSrv(Long idLocalidad){
         CentroPoblado cp;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             centroPobClient = new CentroPobladoClient();
-            cp = centroPobClient.find_JSON(CentroPoblado.class, String.valueOf(idLocalidad));
+            cp = centroPobClient.find_JSON(CentroPoblado.class, String.valueOf(idLocalidad), token.getStrToken());
             // cierro el cliente
             centroPobClient.close();
             // instancio las Entidades servicio
@@ -612,9 +769,10 @@ public class MbPersona {
     }    
 
     /**
-     * Método para deshabilitar los vehículos que pudiera tener asociados la Persona que se está deshabilitando.
-     * Un Vehículo deshabilitado no podrá seleccionarse para asignarlo a una Guía desde el Servicio
-     * @param veh: Vehículo a deshabilitar
+     * Método privado para deshabilitar los vehículos que pudiera tener asociados la Persona que se está deshabilitando.
+     * Un Vehículo deshabilitado no podrá seleccionarse para asignarlo a una Guía desde el Servicio.
+     * Consumido por deshabilitarPersona()
+     * @param veh Vehiculo Vehículo a deshabilitar
      */
     private void deshabilitarVehiculo(Vehiculo veh) {
         // seteo el usuario [DEBERA ACTUALIZARSE PARA TOMAR EL USUARIO LOGEADO]
@@ -627,8 +785,9 @@ public class MbPersona {
     }
 
     /**
-     * Método para habilitar un Vehículo deshabilitado, si la Persona que se está habilitando tuviera vehíulos relacionados.
-     * @param veh 
+     * Método privado para habilitar un Vehículo deshabilitado, si la Persona que se está habilitando tuviera vehíulos relacionados.
+     * Consumido por habilitarPersona()
+     * @param veh Vehiculo Vehículo a habilitar
      */
     private void habilitarVehiculo(Vehiculo veh) {
         // seteo el usuario [DEBERA ACTUALIZARSE PARA TOMAR EL USUARIO LOGEADO]
@@ -640,6 +799,11 @@ public class MbPersona {
         limpiarForm();
     }
 
+    /**
+     * Método privado para validar un Domicilio al registrar una Persona o editar los datos correspondientes a una existente.
+     * Consumido por savePersona()
+     * @return boolean true o false según el domicilio sea validado o no.
+     */
     private boolean validarDomicilio() {
         boolean result = true;
         if(domicilio.getCalle().equals("") && !domicilio.getNumero().equals("")) result = false;
@@ -648,16 +812,32 @@ public class MbPersona {
         return result;
     }
 
+    /**
+     * Método priviado para obtener las Provincias mediante el servicio REST de Centros poblados.
+     * Obtiene las provincias y por cada una crea una EntidadServicio con el id y nombre.
+     * Luego las incluye en el listado listProvincias.
+     * Consumido por cargarEntidadesSrv() y init()
+     */
     private void cargarProvincias() {
         EntidadServicio provincia;
         List<Provincia> listSrv;
         
         try{
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
             // instancio el cliente para la selección de las provincias
             provClient = new ProvinciaClient();
             // obtengo el listado de provincias 
             GenericType<List<Provincia>> gType = new GenericType<List<Provincia>>() {};
-            Response response = provClient.findAll_JSON(Response.class);
+            Response response = provClient.findAll_JSON(Response.class, token.getStrToken());
             listSrv = response.readEntity(gType);
             // lleno el list con las provincias como un objeto Entidad Servicio
             listProvincias = new ArrayList<>();
@@ -677,9 +857,32 @@ public class MbPersona {
         }
     }
 
+    /**
+     * Método privado que recupera una Persona según su id
+     * @param key Long id de la entidad persistida
+     * @return Object la entidad correspondiente
+     */
     private Object getPersona(Long key) {
         return personaFacade.find(key);
     }
+    
+    /**
+     * Método privado que obtiene y setea el token para autentificarse ante la API rest de Territorial
+     * Crea el campo de tipo Token con la clave recibida y el momento de la obtención
+     */
+    private void getToken(){
+        try{
+            usuarioClient = new UsuarioClient();
+            Response responseUs = usuarioClient.authenticateUser_JSON(Response.class, ResourceBundle.getBundle("/Config").getString("UsRestTerr"));
+            MultivaluedMap<String, Object> headers = responseUs.getHeaders();
+            List<Object> lstHeaders = headers.get("Authorization");
+            strToken = (String)lstHeaders.get(0); 
+            token = new Token(strToken, System.currentTimeMillis());
+            usuarioClient.close();
+        }catch(ClientErrorException ex){
+            System.out.println("Hubo un error obteniendo el token para la API Territorial: " + ex.getMessage());
+        }
+    }     
     
     /****************************
     ** Converter para Persona  **

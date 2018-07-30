@@ -23,18 +23,31 @@ import javax.xml.bind.annotation.XmlTransient;
 public class Marca implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * Variable privada: Identificador único
+     */  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    /**
+     * Variable privada: Nombre de la Marca
+     */ 
     @Column (nullable=false, length=20)
     @NotNull(message = "El campo nombre no puede ser nulo")
     @Size(message = "El campo nombre no puede tener más de 20 caracteres", min = 1, max = 20)
     private String nombre;
     
+    
     @OneToMany (mappedBy="marca", orphanRemoval = true)
     private List<Modelo> modelos;    
 
+    /**
+     * Método que devuelve el listado de los Modelos de la Marca de vehículos
+     * No disponible para la API rest
+     * @return List<Modelo> Listado de Modelos
+     */    
     @XmlTransient
     public List<Modelo> getModelos() {
         return modelos;
@@ -60,6 +73,10 @@ public class Marca implements Serializable {
         this.id = id;
     }
 
+    /**
+     * Método que crea un hash con a partir de la id de la entidad
+     * @return int Un entero con el hash
+     */     
     @Override
     public int hashCode() {
         int hash = 0;
@@ -67,6 +84,11 @@ public class Marca implements Serializable {
         return hash;
     }
 
+    /**
+     * Método que compara una instancia de esta entidad con otra según su id
+     * @param object La instancia de entidad a comparar con la presente
+     * @return boolean Verdadero si son iguales, falso si son distintas
+     */       
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -80,6 +102,10 @@ public class Marca implements Serializable {
         return true;
     }
 
+    /**
+     * Método que devuelve un String con el id de la entidad
+     * @return String id de la entidad en formato String
+     */           
     @Override
     public String toString() {
         return "ar.gob.ambiente.sacvefor.rue.enitites.Marca[ id=" + id + " ]";

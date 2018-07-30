@@ -1,6 +1,7 @@
 
 package ar.gob.ambiente.sacvefor.rue.service;
 
+import ar.gob.ambiente.sacvefor.rue.annotation.Secured;
 import ar.gob.ambiente.sacvefor.rue.enitites.Modelo;
 import ar.gob.ambiente.sacvefor.rue.enitites.Persona;
 import ar.gob.ambiente.sacvefor.rue.enitites.Usuario;
@@ -50,12 +51,58 @@ public class VehiculoFacadeREST {
     UriInfo uriInfo;    
 
     /**
-     * Método para crear un Vehículo.
-     * Este método se podrá ejecutar si previamente findByQuery() con el cuit como parámentro, devuelve nulo
-     * @param entity: El Vehículo a persistir
-     * @return : la uri de acceso a la Persona generada
-     */       
+     * @api {post} /vehiculos Registrar un Vehículo
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X POST -d [PATH_SERVER]/rue/rest/vehiculos -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName PostVehiculo
+     * @apiGroup Vehiculos
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiParam {ar.gob.ambiente.sacvefor.servicios.rue.Vehiculo} entity Objeto java del paquete paqRue.jar con los datos del vehículo a registrar
+     * @apiParamExample {java} Ejemplo de Vehículo
+     *      {"entity": {
+     *          "id": "0",
+     *          "anio": "1991",
+     *          "fechaalta": "17-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "matricula": "ABC-123",
+     *          "provinciagestion": "Santiago del Estero",
+     *          "usuario": "ADMINISTRADOR CENTRAL"
+     *          "modelo": 
+     *              {
+     *                  "id": "3",
+     *                  "nombre": "4 RUNNER",
+     *                  "marca": {
+     *                          "id": "2",
+     *                          "nombre": "TOYOTA"
+     *                      }
+     *              }
+     *          }
+     *      }
+     * @apiDescription Método para registrar un nuevo Vehiculo. Instancia una entidad a persistir Vehiculo local y la crea mediante el método local create(Modelo modelo) 
+     * @apiSuccess {String} Location url de acceso mediante GET a la Vehiculo registrado.
+     * @apiSuccessExample Resuesta exitosa:
+     *     HTTP/1.1 201 OK
+     *     {
+     *       {
+     *          "Location": "[PATH_SERVER]/rue/rest/vehiculos/:id"
+     *       }
+     *     }
+     *
+     * @apiError VehiculoNoRegistrado No se registró el Vehiculo.
+     * @apiErrorExample Resuesta de error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "Hubo un error procesando la inserción en el Registro Unico"
+     *     }
+     */     
     @POST
+    @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response create(ar.gob.ambiente.sacvefor.servicios.rue.Vehiculo entity) {
         // instancio la entidad
@@ -75,15 +122,60 @@ public class VehiculoFacadeREST {
     }
 
     /**
-     * Método para editar un Vehículo existente
-     * Este método se podrá ejecutar si findByQuery() con el cuit como parámentro, previamente devuelve nulo o
-     * un Vehículo con el mismo id de la que se está editando
-     * @param id : id del Vehículo a actualizar
-     * @param entity : El Vehículo a actualizar proveniente del paqRue compartido
-     * @return  
-     */        
+     * @api {put} /vehiculos/:id Actualizar un Vehiculo existente
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X PUT -d [PATH_SERVER]/rue/rest/vehiculos/2 -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName PutVehiculos
+     * @apiGroup Vehiculos
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiParam {ar.gob.ambiente.sacvefor.servicios.rue.Vehiculo} entity Objeto java del paquete paqRue.jar con los datos del vehículos a actualizar
+     * @apiParam {Long} Id Identificador único del Vehiculo a actualizar
+     * @apiParamExample {java} Ejemplo de Vehiculo
+     *      {"entity": {
+     *          "id": "2",
+     *          "anio": "1993",
+     *          "fechaalta": "24-11-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "matricula": "ABC-125",
+     *          "provinciagestion": "Santiago del Estero",
+     *          "usuario": "ADMINISTRADOR CENTRAL"
+     *          "modelo": 
+     *              {
+     *                  "id": "7",
+     *                  "nombre": "VIEJO",
+     *                  "marca": {
+     *                          "id": "4",
+     *                          "nombre": "BEDFORD"
+     *                      }
+     *              }
+     *          }
+     *      }
+     * @apiParamExample {json} Emplo de id
+     *      {
+     *          "id": "2"
+     *      }
+     * @apiDescription Método para actualizar un Vehículo existente. Obtiene el Vehículo correspondiente al id recibido 
+     * mediante el método local find(Long id), actualiza sus datos según los de la entidad recibida y la edita mediante 
+     * el método local edit(Vehiculo vehiculo).
+     * @apiSuccessExample Resuesta exitosa:
+     *     HTTP/1.1 200 OK
+     *     {}
+     * @apiError MarcaNoActualizada No se actualizó el Vehículo.
+     * @apiErrorExample Resuesta de error:
+     *     HTTP/1.1 400 Not Modified
+     *     {
+     *       "error": "Hubo un error procesado la actualización en el Registro Unico."
+     *     }
+     */           
     @PUT
     @Path("{id}")
+    @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Response edit(@PathParam("id") Long id, ar.gob.ambiente.sacvefor.servicios.rue.Vehiculo entity) {
         // instancio la entidad
@@ -101,41 +193,199 @@ public class VehiculoFacadeREST {
     }
 
     /**
-     * Método para obtener el Vehículo correspondiente al id recibido
-     * Ej: [PATH]/vehiculos/1
-     * @param id: id de la Marca a obtener
-     * @return
+     * @api {get} /vehiculos/:id Ver un Vehiculo
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X GET -d [PATH_SERVER]/rue/rest/vehiculos/2 -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName GetVehiculo
+     * @apiGroup Vehiculos
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiParam {Long} id Identificador único del Vehículo
+     * @apiDescription Método para obtener un Vehículo existente según el id remitido.
+     * Obtiene el vehículo mediante el método local find(Long id)
+     * @apiSuccess {ar.gob.ambiente.sacvefor.servicios.rue.Vehiculo} Vehiculo Detalle del vehículo registrado.
+     * @apiSuccessExample Respuesta exitosa:
+     *     HTTP/1.1 200 OK
+     *      {
+     *          "id": "2",
+     *          "anio": "1993",
+     *          "fechaalta": "24-11-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "matricula": "ABC-125",
+     *          "provinciagestion": "Santiago del Estero",
+     *          "usuario": "ADMINISTRADOR CENTRAL"
+     *          "modelo": 
+     *              {
+     *                  "id": "7",
+     *                  "nombre": "VIEJO",
+     *                  "marca": {
+     *                          "id": "4",
+     *                          "nombre": "BEDFORD"
+     *                      }
+     *              }
+     *      }
+     * @apiError MarcaNotFound No existe vehículo registrado con ese id.
+     * @apiErrorExample Respuesta de error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "No hay vehículo registrado con el id recibido"
+     *     }
      */      
     @GET
     @Path("{id}")
+    @Secured
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public Vehiculo find(@PathParam("id") Long id) {
         return vehiculoFacade.find(id);
     }
 
     /**
-     * Método que retorn todas los Vehículo registrados
-     * Ej: [PATH]/vehiculos
-     * @return 
-     */    
+     * @api {get} /vehiculos Ver todos los Vehículos
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X GET -d [PATH_SERVER]/rue/rest/vehiculos -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName GetVehiculos
+     * @apiGroup Vehiculos
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiDescription Método para obtener un listado de los Vehículos existentes.
+     * Obtiene los vehículos mediante el método local findAll()
+     * @apiSuccess {ar.gob.ambiente.sacvefor.servicios.rue.Vehiculo} Vehiculo Listado con todas los Vehículos registrados.
+     * @apiSuccessExample Respuesta exitosa:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "Vehiculos": [
+     *          {"id": "1",
+     *          "anio": "1991",
+     *          "fechaalta": "17-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "matricula": "ABC-123",
+     *          "provinciagestion": "Santiago del Estero",
+     *          "usuario": "ADMINISTRADOR CENTRAL"
+     *          "modelo": 
+     *              {
+     *                  "id": "3",
+     *                  "nombre": "4 RUNNER",
+     *                  "marca": {
+     *                          "id": "2",
+     *                          "nombre": "TOYOTA"
+     *                      }
+     *              }
+     *          },
+     *          {"id": "2",
+     *          "anio": "1993",
+     *          "fechaalta": "24-11-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "matricula": "ABC-125",
+     *          "provinciagestion": "Santiago del Estero",
+     *          "usuario": "ADMINISTRADOR CENTRAL"
+     *          "modelo": 
+     *              {
+     *                  "id": "7",
+     *                  "nombre": "VIEJO",
+     *                  "marca": {
+     *                          "id": "4",
+     *                          "nombre": "BEDFORD"
+     *                      }
+     *              }
+     *          }
+     *       ]
+     *     }
+     * @apiError MarcasNotFound No existen vehículos registrados.
+     * @apiErrorExample Respuesta de error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "No hay Vehículos registrados"
+     *     }
+     */   
     @GET
+    @Secured
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findAll() {
         return vehiculoFacade.findAll();
     }
-    
+
     /**
-     * Método que, según los parámetros recibidos ejecuta uno u otro método
-     * @param matricula: con la matrícula devuelve un listado con el Vehículo correspondiente a la matrícula ingresada:
-     * Ej: [PATH]/vehiculos/query?matricula=RJS-374
-     * @param hab: con hab en true, trae los Vehículos habilitados:
-     * Ej: [PATH]/vehiculos/query?hab=true
-     * @param cuit: con el parámetro cuit, devuelve el Vehículo cuyo titular/empresa correspondiente al CUIT ingresado
-     * Ej: [PATH]/vehiculos/query?cuit=20339210315
-     * @return 
-     */        
+     * @api {get} /vehiculos_modelos/query?matricula=:matricula,hab=:hab,cuit=:cuit Ver vehículos según parámetros.
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X GET -d [PATH_SERVER]/rue/rest/vehiculos_modelos/query?name=4 RUNNER -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName GetVehiculoQuery
+     * @apiGroup Vehiculos
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     }
+     * @apiParam {String} matricula Matrícula del Vehículo
+     * @apiParam {String} hab Habilitación del Vehículo
+     * @apiParam {String} cuit cuit del Titular del Vehículo
+     * @apiDescription Método para obtener una Vehículo según su matrícula o según si está o no habilitado, o según el cuit de su titular.
+     * Solo uno de los parámetros tendrá un valor y los restantes nulos.
+     * Según el caso, obtiene el o los vehículos en cuestión con los métodos locales getExistente(String matricula), getHabilitadas() o getByTitular(Long cuit)
+     * @apiSuccess {ar.gob.ambiente.sacvefor.servicios.rue.Vehiculo} Vehículo Detalle del vehículo registrado.
+     * @apiSuccessExample Respuesta exitosa:
+     *     HTTP/1.1 200 OK
+     *     {
+     *       "Vehiculos": [
+     *          {"id": "1",
+     *          "anio": "1991",
+     *          "fechaalta": "17-10-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "matricula": "ABC-123",
+     *          "provinciagestion": "Santiago del Estero",
+     *          "usuario": "ADMINISTRADOR CENTRAL"
+     *          "modelo": 
+     *              {
+     *                  "id": "3",
+     *                  "nombre": "4 RUNNER",
+     *                  "marca": {
+     *                          "id": "2",
+     *                          "nombre": "TOYOTA"
+     *                      }
+     *              }
+     *          },
+     *          {"id": "2",
+     *          "anio": "1993",
+     *          "fechaalta": "24-11-2017",
+     *          "habilitado": "true",
+     *          "idprovinciagt": "22",
+     *          "matricula": "ABC-125",
+     *          "provinciagestion": "Santiago del Estero",
+     *          "usuario": "ADMINISTRADOR CENTRAL"
+     *          "modelo": 
+     *              {
+     *                  "id": "7",
+     *                  "nombre": "VIEJO",
+     *                  "marca": {
+     *                          "id": "4",
+     *                          "nombre": "BEDFORD"
+     *                      }
+     *              }
+     *          }
+     *       ]
+     *     }
+     * @apiError MarcaNotFound No existe vehículo registrado con esos parámetros.
+     * @apiErrorExample Respuesta de error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "No hay vehículo registrado con los parámetros recibidos"
+     *     }
+     */       
     @GET
     @Path("/query")
+    @Secured
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findByQuery(@QueryParam("matricula") String matricula, @QueryParam("hab") boolean hab, @QueryParam("cuit") Long cuit) {
         List<Vehiculo> result = new ArrayList<>();
@@ -152,25 +402,13 @@ public class VehiculoFacadeREST {
         return result;
     }   
     
-    /**
-     * Método que obtiene un listado de Vehículos cuyos id se encuentran entre los parámetros de inicio y fin recibidos
-     * Ej: [PATH]/vehiculos/1/10
-     * @param from: parámetro 'desde' el cual se inicia el listado
-     * @param to: parámetro 'hasta' el cual se completa el listado
-     * @return 
-     */  
     @GET
     @Path("{from}/{to}")
     @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
     public List<Vehiculo> findRange(@PathParam("from") Integer from, @PathParam("to") Integer to) {
         return vehiculoFacade.findRange(new int[]{from, to});
     }
-
-    /**
-     * Método que devuelve un entero con la totalidad de las Vehúculos registrados
-     * Ej: [PATH]/vehiculos/count
-     * @return 
-     */       
+    
     @GET
     @Path("count")
     @Produces(MediaType.TEXT_PLAIN)

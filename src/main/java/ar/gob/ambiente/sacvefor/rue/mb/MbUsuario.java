@@ -7,12 +7,18 @@ import ar.gob.ambiente.sacvefor.rue.facades.RolFacade;
 import ar.gob.ambiente.sacvefor.rue.facades.UsuarioFacade;
 import ar.gob.ambiente.sacvefor.rue.territorial.clases.Provincia;
 import ar.gob.ambiente.sacvefor.rue.territorial.clientes.ProvinciaClient;
+import ar.gob.ambiente.sacvefor.rue.territorial.clientes.UsuarioClient;
 import ar.gob.ambiente.sacvefor.rue.util.CriptPass;
 import ar.gob.ambiente.sacvefor.rue.util.JsfUtil;
+import ar.gob.ambiente.sacvefor.rue.util.Token;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+import java.util.ResourceBundle;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
@@ -27,7 +33,9 @@ import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.core.GenericType;
+import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
 
 /**
@@ -36,31 +44,101 @@ import javax.ws.rs.core.Response;
  */
 public class MbUsuario {
 
-    // campos para gestionar
+    /**
+     * Variable privada: Usuario Entidad que se gestiona mediante el bean
+     */  
     private Usuario usuario;
+    
+    /**
+     * Variable privada: List<Usuario> listado de los Usuarios registrados que compone la tabla para su gestión
+     */
     private List<Usuario> lstUsuarios;
+    
+    /**
+     * Variable privada: List<Usuario> listado para el filtrado de la tabla
+     */
     private List<Usuario> lstFilters;
+    
+    /**
+     * Variable privada: List<Rol> listado de los Roles disponibles para asignarlos a un Usuario al registrarlo o editar sus datos.
+     */
     private List<Rol> lstRoles;    
+    
+    /**
+     * Variable privada: String clave a asignar al usuario
+     */
     private String pass;
+    
+    /**
+     * Variable privada: Provincia provincia a la cual pertenece el usuario, si corresponde.
+     */
     private Provincia provincia;
+    
+    /**
+     * Variable privada: List<Provincia> listado de las Provincias disponibles para asignarla a un Usuario al registrarlo o editar sus datos.
+     * Si corresponde.
+     */
     private List<Provincia> lstProvincias;
+    
+    /**
+     * Variable privada: boolean que indica que el formulario mostrado es de una vista detalle de la entidad
+     */
     private boolean view;
+    
+    /**
+     * Variable privada: List<Usuario> listado de las revisiones de un usuario, para su auditoría.
+     */
     private List<Usuario> lstRevisions;
+    
+    /**
+     * Variable privada: String nombre con el que se identifica al Usuario a auditar
+     */
     private String nombreAud;   
     
-    // inyección de recursos
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Usuario
+     */  
     @EJB
     private UsuarioFacade usuarioFacade;
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Rol
+     */  
     @EJB
     private RolFacade rolFacade;     
- 
+    
+    /**
+     * Variable privada: Session mail sesion del servidor para gestionar el envío de correos electrónicos
+     */
     @Resource(mappedName ="java:/mail/ambientePrueba")
     private Session mailSesion;
+    
+    /**
+     * Variable privada: String mensaje a enviar por correo electrónico a los usuarios
+     */
     private Message mensaje;
     
-    // Cliente REST para la selección de la Provincia
+    /**
+     * Variable privada: ProvinciaClient Cliente para la API REST de Provincias del servicio de organización territorial
+     */    
     private ProvinciaClient client;
-
+    
+    /**
+     * Variable privada: UsuarioClient Cliente para la API REST de autenticación de usuarios del servicio de organización territorial
+     */
+    private UsuarioClient usuarioClient;
+    
+    private Token token;
+    private String strToken;      
+    
+    /**
+     * Variable privada: Logger logger que registra el log del server con resultados de operaciones de servicios
+     */
+    private static final Logger logger = Logger.getLogger(MbUsuario.class.getName());    
+   
+    /**
+     * Constructor
+     */
     public MbUsuario() {
     }
       
@@ -115,6 +193,10 @@ public class MbUsuario {
         this.usuario = usuario;
     }
 
+    /**
+     * Método para obtener los usuarios registrados y poblar el listado correspondiente
+     * @return 
+     */
     public List<Usuario> getLstUsuarios() {
         lstUsuarios = usuarioFacade.findAll();
         return lstUsuarios;
@@ -144,19 +226,38 @@ public class MbUsuario {
     /***********************
      * Mátodos operativos **
      ***********************/
+    
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa las entidades a gestionar, 
+     * el listado de Roles disponibles, el cliente para el API REST de Centros poblados,
+     * y obtiene las Provincias de la API para luego poblar el listado correspondiente para su selección
+     */     
     @PostConstruct
     public void init(){
         usuario = new Usuario();
         lstRoles = rolFacade.findAll();
         // instancio el cliente para la selección de las provincias
         client = new ProvinciaClient();
+        // obtengo el token si no está seteado o está vencido
+        if(token == null){
+            getToken();
+        }else try {
+            if(!token.isVigente()){
+                getToken();
+            }
+        } catch (IOException ex) {
+            logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+        }
         // obtengo el listado de provincias 
         provincia = new Provincia();
         GenericType<List<Provincia>> gType = new GenericType<List<Provincia>>() {};
-        Response response = client.findAll_JSON(Response.class);
+        Response response = client.findAll_JSON(Response.class, token.getStrToken());
         lstProvincias = response.readEntity(gType);
     }      
     
+    /**
+     * Método que se ejecuta luego de cerrarse la clase. Cierra el cliente de la API de Centros poblados para la obtención de las Provincias
+     */
     @PreDestroy
     public void cerrar(){
         client.close();
@@ -164,6 +265,7 @@ public class MbUsuario {
     
     /**
      * Método para guardar el Usuario, sea inserción o edición.
+     * Una vez generado envía un correo electrónico al usuario con las credenciales de acceso
      * Previa validación
      */      
     public void saveUsuario(){
@@ -272,7 +374,17 @@ public class MbUsuario {
      */
     public void prepareEdit(){
         if(usuario.getIdProvincia() != null){
-            provincia = client.find_JSON(Provincia.class, String.valueOf(usuario.getIdProvincia()));
+            // obtengo el token si no está seteado o está vencido
+            if(token == null){
+                getToken();
+            }else try {
+                if(!token.isVigente()){
+                    getToken();
+                }
+            } catch (IOException ex) {
+                logger.log(Level.SEVERE, "{0} - {1}", new Object[]{"Hubo un error obteniendo la vigencia del token TERR", ex.getMessage()});
+            }
+            provincia = client.find_JSON(Provincia.class, String.valueOf(usuario.getIdProvincia()), token.getStrToken());
         }
     }
     
@@ -378,6 +490,14 @@ public class MbUsuario {
      * Métodos privados **
      *********************/
     
+    /**
+     * Método privado para enviar los correos electrónicos.
+     * Consume el mail sesion del servidor.
+     * Consumido por saveUsuario() y por cambiarPass()
+     * @param correo String dirección de correo electrónico
+     * @param motivo String motivo del envío
+     * @return boolean true si el envío es exitoso y flase si hubo errores.
+     */
     private boolean enviarCorreo(String correo, String motivo){  
         boolean result;
         String bodyMessage;
@@ -422,6 +542,11 @@ public class MbUsuario {
         return result;
     }    
 
+    /**
+     * Método privado para obtener una Provincia según si id
+     * @param key Long id de la Provincia
+     * @return Provincia Provincia seleccionada
+     */
     private Provincia getProvincia(Long key) {
         Provincia result = new Provincia();
         for(Provincia prov : lstProvincias){
@@ -431,6 +556,24 @@ public class MbUsuario {
         }
         return result;
     }
+    
+    /**
+     * Método privado que obtiene y setea el token para autentificarse ante la API rest de Territorial
+     * Crea el campo de tipo Token con la clave recibida y el momento de la obtención
+     */
+    private void getToken(){
+        try{
+            usuarioClient = new UsuarioClient();
+            Response responseUs = usuarioClient.authenticateUser_JSON(Response.class, ResourceBundle.getBundle("/Config").getString("UsRestTerr"));
+            MultivaluedMap<String, Object> headers = responseUs.getHeaders();
+            List<Object> lstHeaders = headers.get("Authorization");
+            strToken = (String)lstHeaders.get(0); 
+            token = new Token(strToken, System.currentTimeMillis());
+            usuarioClient.close();
+        }catch(ClientErrorException ex){
+            System.out.println("Hubo un error obteniendo el token para la API Territorial: " + ex.getMessage());
+        }
+    }        
 
     /******************************
     ** Converter para Provincia  **

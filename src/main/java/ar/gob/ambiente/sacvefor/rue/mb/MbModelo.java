@@ -20,16 +20,41 @@ import javax.faces.convert.FacesConverter;
  */
 public class MbModelo {
 
+    /**
+     * Variable privada: Modelo Entidad que se gestiona mediante el bean
+     */    
     private Modelo modelo;
+    
+    /**
+     * Variable privada: List<Modelo> listado de los Modelos registrados que compone la tabla para su gestión
+     */
     private List<Modelo> lstModelos;
+    
+    /**
+     * Variable privada: listado para el filtrado de la tabla
+     */
     private List<Modelo> lstFilters;
+    
+    /**
+     * Variable privada: List<Marca> listado de las Marcas disponibles para asignar a un modelo al insertar o actualizar
+     */
     private List<Marca> lstMarcas;
     
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Modelo
+     */  
     @EJB
     private ModeloFacade modeloFacade;
+    
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Marca
+     */  
     @EJB
     private MarcaFacade marcaFacade;       
     
+    /**
+     * Constructor
+     */
     public MbModelo() {
     }
 
@@ -53,6 +78,10 @@ public class MbModelo {
         this.modelo = modelo;
     }
 
+    /**
+     * Método que puebla el listado de los Modelos existentes
+     * @return List<Modelo> listado de Modelos existentes
+     */
     public List<Modelo> getLstModelos() {
         lstModelos = modeloFacade.findAll();
         return lstModelos;
@@ -74,6 +103,10 @@ public class MbModelo {
     /***********************
      * Mátodos operativos **
      ***********************/
+    
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa la entidad a gestionar y el listado de Marcas disponibles
+     */ 
     @PostConstruct
     public void init(){
         modelo = new Modelo();
@@ -145,6 +178,12 @@ public class MbModelo {
     /*********************
      * Métodos privados **
      *********************/    
+    
+    /**
+     * Método privado que recupera un Modelo según su id
+     * @param key Long id de la entidad persistida
+     * @return Object la entidad correspondiente
+     */
     private Object getModelo(Long key) {
         return modeloFacade.find(key);
     }

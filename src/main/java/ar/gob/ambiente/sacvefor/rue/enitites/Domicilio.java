@@ -27,28 +27,44 @@ import org.hibernate.envers.Audited;
 public class Domicilio implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * Variable privada: Identificador único
+     */  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    /**
+     * Variable privada: Nombre de la calle
+     */ 
     @Column (length=50)
     @Size(message = "El campo calle no puede tener más de 50 caracteres", max = 50)
     private String calle;
     
+    /**
+     * Variable privada: Número de puerta
+     */
     @Column (length=10)
     @Size(message = "El campo numero no puede tener más de 10 caracteres", max = 10)
     private String numero;
     
+    /**
+     * Variable privada: Piso del edificio, si correspondiera
+     */
     @Column (length=10)
     @Size(message = "El campo piso no puede tener más de 10 caracteres", max = 10)
     private String piso;    
     
+    /**
+     * Variable privada: Identificación del departamento, si correspondiera
+     */
     @Column (length=5)
     @Size(message = "El campo depto no puede tener más de 5 caracteres", max = 5)
     private String depto;   
 
     /**
-     * Identificación de la localidad en la que se ubica el domicilio.
+     * Variable privada: Identificación de la localidad en la que se ubica el domicilio.
      * Esta identificación hará referencia a la localidad del
      * servicio gestion territorial.
      */
@@ -56,7 +72,7 @@ public class Domicilio implements Serializable {
     private Long idLocalidadGt;   
     
     /**
-     * Nombre de la localidad cacheado del servicio gestion territorial.
+     * Variable privada: Nombre de la localidad cacheado del servicio gestion territorial.
      */
     @Column (nullable=false, length=50)
     @NotNull(message = "El campo localidad no puede ser nulo")
@@ -64,7 +80,7 @@ public class Domicilio implements Serializable {
     private String localidad;
 
     /**
-     * Nombre del departamento cacheado del servicio gestion territorial.
+     * Variable privada: Nombre del departamento cacheado del servicio gestion territorial.
      */
     @Column (nullable=false, length=50)
     @NotNull(message = "El campo departamento no puede ser nulo")
@@ -72,7 +88,7 @@ public class Domicilio implements Serializable {
     private String departamento;
 
     /**
-     * Nombre de la provincia cacheado del servicio gestion territorial.
+     * Variable privada: Nombre de la provincia cacheado del servicio gestion territorial.
      */
     @Column (nullable=false, length=70)
     @NotNull(message = "El campo provincia no puede ser nulo")
@@ -80,14 +96,14 @@ public class Domicilio implements Serializable {
     private String provincia;    
     
     /**
-     * Usuario que gestiona al Domicilio, tanto en el alta como en las modificaciones que pudiera tener
+     * Variable privada: Usuario que gestiona al Domicilio, tanto en el alta como en las modificaciones que pudiera tener
      */
     @ManyToOne(fetch=FetchType.LAZY)
     @JoinColumn(name="usuario_id")
     private Usuario usuario; 
 
     /**
-     * campo que cachea el nombre del usuario de gestión
+     * Variable privada: campo que cachea el nombre del usuario de gestión
      */    
     private String strUsuario;
     
@@ -96,6 +112,11 @@ public class Domicilio implements Serializable {
         super();
     }       
 
+    /**
+     * Método que devuelve el nombre del usuario de gestión
+     * No disponible para la API rest
+     * @return String nombre del usuario
+     */    
     @XmlTransient
     public String getStrUsuario() {
         return strUsuario;
@@ -105,6 +126,11 @@ public class Domicilio implements Serializable {
         this.strUsuario = strUsuario;
     }
 
+    /**
+     * Método que devuelve el Usuario de gestión
+     * No disponible para la API rest
+     * @return Usuario usuario de gestión
+     */    
     @XmlTransient
     public Usuario getUsuario() {
         return usuario;
@@ -186,6 +212,10 @@ public class Domicilio implements Serializable {
         this.id = id;
     }
 
+    /**
+     * Método que crea un hash con a partir de la id de la entidad
+     * @return int Un entero con el hash
+     */     
     @Override
     public int hashCode() {
         int hash = 0;
@@ -193,6 +223,11 @@ public class Domicilio implements Serializable {
         return hash;
     }
 
+    /**
+     * Método que compara una instancia de esta entidad con otra según su id
+     * @param object La instancia de entidad a comparar con la presente
+     * @return boolean Verdadero si son iguales, falso si son distintas
+     */            
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -206,6 +241,10 @@ public class Domicilio implements Serializable {
         return true;
     }
 
+    /**
+     * Método que devuelve un String con el id de la entidad
+     * @return String id de la entidad en formato String
+     */     
     @Override
     public String toString() {
         return "ar.gob.ambiente.sacvefor.rue.enitites.Domicilio[ id=" + id + " ]";

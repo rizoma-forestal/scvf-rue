@@ -18,12 +18,25 @@ import javax.faces.convert.FacesConverter;
  */
 public class MbRol {
 
+    /**
+     * Variable privada: Rol Entidad que se gestiona mediante el bean
+     */
     private Rol rol;
+    
+    /**
+     * Variable privada: List<Rol> listado de los Roles registrados que compone la tabla para su gestión
+     */
     private List<Rol> lstRoles;
     
+    /**
+     * Variable privada: EJB inyectado para el acceso a datos de Rol
+     */  
     @EJB
     private RolFacade rolFacade;
     
+    /**
+     * Constructor
+     */
     public MbRol() {
     }
     
@@ -38,6 +51,10 @@ public class MbRol {
         this.rol = rol;
     }
 
+    /**
+     * Método para obtener los roles registrados y poblar el listado correspondiente
+     * @return List<Rol> listado de roles existentes
+     */
     public List<Rol> getLstRoles() {
         lstRoles = rolFacade.findAll();
         return lstRoles;
@@ -50,6 +67,10 @@ public class MbRol {
     /***********************
      * Mátodos operativos **
      ***********************/
+    
+    /**
+     * Método que se ejecuta luego de instanciada la clase e inicializa la entidad a gestionar
+     */    
     @PostConstruct
     public void init() {
         rol = new Rol();
@@ -119,6 +140,12 @@ public class MbRol {
     /*********************
      * Métodos privados **
      *********************/
+    
+    /**
+     * Método privado que recupera un Rol según su id
+     * @param key Long id de la entidad persistida
+     * @return Object la entidad correspondiente
+     */
     private Object getRol(Long key) {
         return rolFacade.find(key);
     }

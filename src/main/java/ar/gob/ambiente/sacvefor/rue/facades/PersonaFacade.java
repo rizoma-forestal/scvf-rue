@@ -14,28 +14,38 @@ import org.hibernate.envers.AuditReader;
 import org.hibernate.envers.AuditReaderFactory;
 
 /**
- *
+ * Clase que implementa la abstracta para el acceso a datos de la entidad Persona.
  * @author rincostante
  */
 @Stateless
 public class PersonaFacade extends AbstractFacade<Persona> {
 
+    /**
+     * Variable privada: EntityManager al que se le indica la unidad de persistencia mediante la cual accederá a la base de datos
+     */     
     @PersistenceContext(unitName = "svf_ruePU")
     private EntityManager em;
 
+    /**
+     * Método que implementa el abstracto para la obtención del EntityManager
+     * @return EntityManager para acceder a datos
+     */         
     @Override
     protected EntityManager getEntityManager() {
         return em;
     }
 
+    /**
+     * Constructor
+     */
     public PersonaFacade() {
         super(Persona.class);
     }
     
     /**
      * Método para obtener una Persona según su CUIT, si existe
-     * @param cuit
-     * @return 
+     * @param cuit Long cuit de cuya Persona se consulta
+     * @return Persona Persona vinculada al cuit recibido
      */
     public Persona getExistente(Long cuit) {
         List<Persona> lstPersonas;
@@ -56,7 +66,7 @@ public class PersonaFacade extends AbstractFacade<Persona> {
     /**
      * Método que devuelve las Personas habilitadas
      * Sin distinción del tipo.
-     * @return 
+     * @return List<Persona> listado de las personas habilitadas
      */
     public List<Persona> getHabilitadas(){
         List<Persona> lstPersonas;
@@ -71,8 +81,8 @@ public class PersonaFacade extends AbstractFacade<Persona> {
     }
     
     /**
-     * Método que devuleve las Personas Físicas
-     * @return 
+     * Método que devuleve las Personas Físicas ordenadas por nombre completo
+     * @return List<Persona> listado de las Personas físicas registradas.
      */
     public List<Persona> getFisicas(){
         List<Persona> lstPersonas;
@@ -88,8 +98,8 @@ public class PersonaFacade extends AbstractFacade<Persona> {
     }
     
     /**
-     * Método que devuleve las Personas Físicas habilitadas
-     * @return 
+     * Método que devuleve las Personas Físicas habilitadas ordenadas por nombre completo
+     * @return List<Persona> listado de los Personas físicas habilitadas
      */
     public List<Persona> getFisicasHab(){
         List<Persona> lstPersonas;
@@ -106,8 +116,8 @@ public class PersonaFacade extends AbstractFacade<Persona> {
     }    
     
     /**
-     * Método que devuleve las Personas Jurídicas 
-     * @return 
+     * Método que devuleve las Personas Jurídicas ordenadas por razón social
+     * @return List<Persona> listado de las Personas jurídicas
      */
     public List<Persona> getJuridicas(){
         List<Persona> lstPersonas;
@@ -123,8 +133,8 @@ public class PersonaFacade extends AbstractFacade<Persona> {
     }    
     
     /**
-     * Método que devuleve las Personas Jurídicas habilitadas
-     * @return 
+     * Método que devuleve las Personas Jurídicas habilitadas ordenadas por razón social
+     * @return List<Persona> listado de las Personas jurídicas habilitadas
      */
     public List<Persona> getJuridicasHab(){
         List<Persona> lstPersonas;
@@ -144,7 +154,7 @@ public class PersonaFacade extends AbstractFacade<Persona> {
      * Método que devuelve las Personas físicas o jurídicas cuya entidad sea "EMPRESA DE TRANSPORTE"
      * Solo para la app porque desde la API está el método getPersonas(Long id) que devuelve las Personas
      * del Tipo de Entidad cuyo id se recibe como parámetro.
-     * @return 
+     * @return List<Persona> listado de las Empresas de transporte
      */
     public List<Persona> getEmpresasTransporteHab(){
         List<Persona> lstPersonas;
@@ -161,8 +171,8 @@ public class PersonaFacade extends AbstractFacade<Persona> {
     
     /**
      * Método para obtener todas las revisiones de la entidad
-     * @param cuitAud
-     * @return 
+     * @param cuitAud Long cuit de la Persona auditada
+     * @return List<Persona> listado de las revisiones de una Persona
      */
     public List<Persona> findRevisions(Long cuitAud){
         List<Persona> lstClientes = new ArrayList<>();

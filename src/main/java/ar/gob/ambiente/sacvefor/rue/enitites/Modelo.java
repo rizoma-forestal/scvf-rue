@@ -23,15 +23,25 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Modelo implements Serializable {
 
     private static final long serialVersionUID = 1L;
+    
+    /**
+     * Variable privada: Identificador único
+     */  
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     
+    /**
+     * Variable privada: Nombre del Modelo
+     */ 
     @Column (nullable=false, length=20)
     @NotNull(message = "El campo nombre no puede ser nulo")
     @Size(message = "El campo nombre no puede tener más de 20 caracteres", min = 1, max = 20)
     private String nombre;
 
+    /**
+     * Variable privada: Marca a la que pertenece el Modelo del Vehículo
+     */ 
     @ManyToOne
     @JoinColumn(name="marca_id", nullable=false)
     @NotNull(message = "Debe existir una Marca")
@@ -61,6 +71,10 @@ public class Modelo implements Serializable {
         this.id = id;
     }
 
+    /**
+     * Método que crea un hash con a partir de la id de la entidad
+     * @return int Un entero con el hash
+     */       
     @Override
     public int hashCode() {
         int hash = 0;
@@ -68,6 +82,11 @@ public class Modelo implements Serializable {
         return hash;
     }
 
+    /**
+     * Método que compara una instancia de esta entidad con otra según su id
+     * @param object La instancia de entidad a comparar con la presente
+     * @return boolean Verdadero si son iguales, falso si son distintas
+     */       
     @Override
     public boolean equals(Object object) {
         // TODO: Warning - this method won't work in the case the id fields are not set
@@ -81,6 +100,10 @@ public class Modelo implements Serializable {
         return true;
     }
 
+    /**
+     * Método que devuelve un String con el id de la entidad
+     * @return String id de la entidad en formato String
+     */       
     @Override
     public String toString() {
         return "ar.gob.ambiente.sacvefor.rue.enitites.Modelo[ id=" + id + " ]";
