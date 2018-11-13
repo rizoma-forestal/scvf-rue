@@ -35,6 +35,56 @@ public class DomicilioFacadeREST {
     @Context
     UriInfo uriInfo;    
 
+    /**
+     * @api {post} /domicilios Registrar un Domicilio para una Persona existente
+     * Para uso del proceso de emisión remota de guías
+     * @apiExample {curl} Ejemplo de uso:
+     *     curl -X POST -d [PATH_SERVER]/rue/rest/domicilios -H "authorization: xXyYvWzZ"
+     * @apiVersion 1.0.0
+     * @apiName PostDomicilio
+     * @apiGroup Domicilio
+     * @apiHeader {String} Authorization Token recibido al autenticar el usuario
+     * @apiHeaderExample {json} Ejemplo de header:
+     *     {
+     *       "Authorization": "xXyYvWzZ"
+     *     } 
+     * @apiParam {ar.gob.ambiente.sacvefor.servicios.rue.Domicilio} entity Objeto java del paquete paqRue.jar con los datos del Domicilio a registrar
+     * @apiParamExample {java} Ejemplo de Domicilio
+     *      "entity":
+     *              {
+     *                  "id":"5",
+     *                  "calle":"OTILIAS",
+     *                  "departamento":"COMUNA 10",
+     *                  "depto":"B",
+     *                  "idlocalidadgt":"10835",
+     *                  "localidad":"VERSALLES - BARRIO",
+     *                  "numero":"569",
+     *                  "piso":"3",
+     *                  "provincia":"CIUDAD AUTONOMA DE BUENOS AIRES",
+     *                  "strusuario":"ADMINISTRADOR CENTRAL"
+     *              }
+     *      
+     * @apiDescription Método para registrar un Domicilio para una Persona existente.
+     * Setea el domicilio con los datos obtenidos de la entidad paramétrica 
+     * y lo registra mediante el método "create" de DomicilioFacade.
+     * Si el proceso fue exitoso, genera la respuesta con la url de acceso al Domicilio creado.
+     * En caso contrario retorna una respuesta de error.
+     * @apiSuccess {String} Location url de acceso mediante GET al Domicilio registrado.
+     * @apiSuccessExample Response exitosa:
+     *     HTTP/1.1 201 OK
+     *     {
+     *       {
+     *          "Location": "[PATH_SERVER]/rue/rest/domicilios/:id"
+     *       }
+     *     }
+     *
+     * @apiError DomicilioNoRegistrado No se registró el Domicilio.
+     * @apiErrorExample Respuesta de Error:
+     *     HTTP/1.1 400 Not Found
+     *     {
+     *       "error": "Hubo un error procesando la inserción del Domicilio en el Registro Unico"
+     *     }
+     */        
     @POST
     @Secured
     @Consumes({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
