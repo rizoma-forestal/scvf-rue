@@ -25,6 +25,7 @@ public class ApplicationConfig extends Application {
      * If required, comment out calling this method in getClasses().
      */
     private void addRestResourceClasses(Set<Class<?>> resources) {
+        resources.add(ar.gob.ambiente.sacvefor.rue.service.DomicilioFacadeREST.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.MarcaFacadeREST.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.ModeloFacadeREST.class);
         resources.add(ar.gob.ambiente.sacvefor.rue.service.PersonaFacadeREST.class);
